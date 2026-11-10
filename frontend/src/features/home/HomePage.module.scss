@@ -1,0 +1,71 @@
+// 방 만들기 화면처럼 밝은 배경 위에 가운데 정렬한 콘텐츠를 배치합니다.
+.home {
+  width: min(100% - 40px, 560px);
+  margin: 0 auto;
+  padding: 20px 0 60px;
+  text-align: center;
+}
+
+// 소개 문구의 글자 크기와 간격은 오셀로 입장 화면과 맞춥니다.
+.eyebrow { margin-top: clamp(32px, 8vh, 72px); color: var(--color-primary-hover); font-size: 12px; }
+.home h1 { margin: 10px 0 0; font-size: 25px; font-weight: 650; letter-spacing: -.7px; }
+.description { margin-top: 12px; color: var(--color-muted); font-size: 14px; line-height: 1.7; }
+
+// 같은 탭의 참가 정보로 방 복귀 안내를 표시합니다.
+.recovery { width: min(100%, 360px); margin: 26px auto 0; }
+
+// 게임이 늘어나면 같은 크기의 정사각형 카드가 가운데에서 여러 열로 배치됩니다.
+.games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 200px));
+  justify-content: center;
+  gap: 16px;
+  margin-top: 30px;
+}
+.game {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: center;
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover { border-color: var(--color-primary); background: var(--color-background); }
+  strong { font-size: 18px; font-weight: 650; }
+  > span:not(.board) { color: var(--color-muted); font-size: 12px; line-height: 1.6; }
+  small { color: var(--color-primary-hover); font-size: 11px; }
+}
+
+// 카드의 작은 보드와 돌에도 실제 오셀로 보드와 같은 색상 토큰을 사용합니다.
+.board {
+  width: 64px;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--color-grid);
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--color-board-light), var(--color-board) 48%, var(--color-board-dark));
+}
+.board i {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, var(--color-black-highlight), var(--color-black) 78%);
+  box-shadow: 0 1px 2px rgb(from var(--color-shadow) r g b / 24%);
+}
+.board i:first-child, .board i:last-child {
+  border: 1px solid rgb(from var(--color-black) r g b / 28%);
+  background: radial-gradient(circle at 35% 25%, var(--color-white) 35%, var(--color-white-shadow));
+}
+
+// 모션 줄이기를 선택한 사용자에게는 카드 색상 전환을 즉시 적용합니다.
+@media (prefers-reduced-motion: reduce) { .game { transition: none; } }

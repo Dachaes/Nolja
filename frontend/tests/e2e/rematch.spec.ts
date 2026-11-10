@@ -60,9 +60,10 @@ test('both devices see results, cancel and accept rematches, then return to the 
     await expect(host.getByRole('alert')).toContainText('잠시 후 다시 시도')
     await expect(hostResult).toBeVisible()
     await host.getByRole('button', { name: '로비로 돌아가기', exact: true }).click()
-    await expect(host.getByText('오셀로 로비', { exact: true })).toBeVisible()
+    await expect(host.getByRole('heading', { name: '오늘은 무엇을 할까요?' })).toBeVisible()
+    await host.getByRole('button', { name: /오셀로/ }).click()
     await expect(host.getByLabel('닉네임', { exact: true })).toHaveValue('민서')
-    expect(await host.evaluate(roomCode => sessionStorage.getItem(`nollja:room:${roomCode}`), code)).toBeNull()
+    expect(await host.evaluate(roomCode => sessionStorage.getItem(`nolja:room:${roomCode}`), code)).toBeNull()
 
     // 먼저 나간 사람 때문에 상대의 결과가 사라지지 않으며 닫힌 방에서 재대결할 수는 없습니다.
     await expect(guestResult).toBeVisible()
@@ -73,8 +74,8 @@ test('both devices see results, cancel and accept rematches, then return to the 
     await expect(guest.getByText('연결 종료', { exact: true })).toBeVisible()
     await expect(guestResult.getByText('2번째 대국 결과', { exact: true })).toBeVisible()
     await guest.getByRole('button', { name: '로비로 돌아가기', exact: true }).click()
-    await expect(guest.getByText('오셀로 로비', { exact: true })).toBeVisible()
-    expect(await guest.evaluate(roomCode => sessionStorage.getItem(`nollja:room:${roomCode}`), code)).toBeNull()
+    await expect(guest.getByRole('heading', { name: '오늘은 무엇을 할까요?' })).toBeVisible()
+    expect(await guest.evaluate(roomCode => sessionStorage.getItem(`nolja:room:${roomCode}`), code)).toBeNull()
     await host.getByRole('button', { name: '방 만들기', exact: true }).click()
     await expect(host.getByRole('heading', { name: '친구를 기다리는 중' })).toBeVisible()
     expect(host.url()).not.toBe(invite)

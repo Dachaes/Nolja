@@ -180,7 +180,7 @@ public class RoomService {
         return updated;
     }
 
-    // 참가 ID·닉네임·회원 ID·토큰은 유지하고 돌 색상과 대국 상태만 초기화합니다.
+    // 참가 ID·닉네임·토큰은 유지하고 돌 색상과 대국 상태만 초기화합니다.
     // 방 전체 revision은 초기화하지 않아 이전 판의 지연 응답이 새 보드를 덮어쓰지 못하게 합니다.
     private void startNextGame(Room room) {
         room.members.replaceAll(member -> {
@@ -270,7 +270,7 @@ public class RoomService {
     }
 
     // 공개 식별자는 UUID, 비밀 인증 토큰은 32바이트 보안 난수로 각각 발급합니다.
-    // userId는 로그인 계정이 없는 비회원이므로 null입니다.
+    // 계정 없이 참가하므로 호환용 userId는 null입니다. 식별과 인증에는 playerId와 토큰을 사용합니다.
     private Member member(String nickname, String color) {
         byte[] bytes = new byte[32];
         random.nextBytes(bytes);
@@ -313,4 +313,5 @@ public class RoomService {
 
         Room(String code, Instant expiresAt) { this.code = code; this.expiresAt = expiresAt; }
     }
+
 }

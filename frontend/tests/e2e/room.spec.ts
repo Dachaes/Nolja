@@ -12,6 +12,11 @@ test('two devices create, copy an invite, join, play only their turns, reload an
   const third = await thirdContext.newPage()
   // 겉으로 화면이 보여도 JavaScript 예외가 발생했을 수 있으므로 별도로 모아 마지막에 확인합니다.
   const errors: string[] = []
+  // 계정 API가 없어도 홈부터 대국까지 가능해야 합니다. 숨은 로그인 의존성이 다시 생기면 실패합니다.
+  const accountRequests: string[] = []
+  for (const page of [host, guest]) page.on('request', request => {
+    if (/\/api\/(auth|account|friends)(\/|$)/.test(request.url())) accountRequests.push(request.url())
+  })
   // 정상 대국에서 /state 요청 없이 WebSocket만으로 보드가 동기화되는지 확인합니다.
   const stateRequests: string[] = []
   host.on('request', request => { if (request.url().endsWith('/state')) stateRequests.push(request.url()) })
@@ -21,6 +26,8 @@ test('two devices create, copy an invite, join, play only their turns, reload an
   try {
     // 방 생성 후에는 대기실만 보여야 합니다. 초대 주소에는 방 코드만 포함되는지도 확인합니다.
     await host.goto('/')
+    await expect(host.getByRole('button', { name: /로그인|회원가입/ })).toHaveCount(0)
+    await host.getByRole('button', { name: /오셀로/ }).click()
     await expect(host.getByRole('heading', { name: '우리, 한 판 놀까요?' })).toBeVisible()
     await host.getByLabel('닉네임', { exact: true }).fill('민서')
     await host.getByRole('button', { name: '방 만들기', exact: true }).click()
@@ -72,10 +79,11 @@ test('two devices create, copy an invite, join, play only their turns, reload an
     // 퇴장 확인창을 수락하면 본인은 홈으로, 남은 상대는 종료 안내로 전환되어야 합니다.
     guest.once('dialog', dialog => dialog.accept())
     await guest.getByRole('button', { name: '방 나가기' }).click()
-    await expect(guest.getByRole('heading', { name: '우리, 한 판 놀까요?' })).toBeVisible()
+    await expect(guest.getByRole('heading', { name: '오늘은 무엇을 할까요?' })).toBeVisible()
     await expect(host.getByRole('alert')).toContainText('종료된 방')
     expect(errors).toEqual([])
     expect(stateRequests).toEqual([])
+    expect(accountRequests).toEqual([])
   // 테스트가 실패해도 열린 브라우저 context를 닫아 다음 테스트에 영향을 주지 않게 합니다.
   } finally {
     await Promise.all([hostContext.close(), guestContext.close(), thirdContext.close()])
@@ -102,6 +110,7 @@ test('a disconnected player cannot move and reconnects to the latest board witho
 
   try {
     await host.goto('/')
+    await host.getByRole('button', { name: /오셀로/ }).click()
     await host.getByLabel('닉네임', { exact: true }).fill('흑기사')
     await host.getByRole('button', { name: '방 만들기', exact: true }).click()
     await expect(host.getByText('실시간 연결됨', { exact: true })).toBeVisible()
@@ -145,6 +154,7 @@ test('invalid links and nickname validation stay recoverable on a small phone', 
   await page.goto('/room/bad-link')
   await expect(page.getByRole('heading', { name: '올바른 초대 링크가 아니에요' })).toBeVisible()
   await page.getByRole('button', { name: '새 방 만들기' }).click()
+  await page.getByRole('button', { name: /오셀로/ }).click()
   await page.getByRole('button', { name: '방 만들기', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('닉네임을 입력')
   await page.getByLabel('닉네임', { exact: true }).fill('a')

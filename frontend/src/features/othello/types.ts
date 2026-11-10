@@ -6,12 +6,12 @@ export type Cell = DiscColor | null
 export type Board = ReadonlyArray<ReadonlyArray<Cell>>
 export interface Position { row: number; col: number }
 
-// 참가자 ID, 표시 이름, 로그인 계정 ID를 분리해 비회원 대전에도 같은 모델을 사용합니다.
+// 참가자 식별자와 표시 이름을 분리합니다. 닉네임은 인증에 사용하지 않습니다.
 export interface Player {
   // 서버가 방 참가 시 발급합니다. 닉네임 대신 비교 및 React key에 사용합니다.
   playerId: string
   nickname: string
-  // 아직 로그인하지 않은 참가자는 없거나 null입니다.
+  // 기존 방 데이터와의 호환용 필드이며 현재 서버는 항상 null을 반환합니다.
   userId?: string | null
   color: DiscColor
 }

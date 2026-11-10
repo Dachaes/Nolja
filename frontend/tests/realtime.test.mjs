@@ -41,5 +41,5 @@ test('malformed frames cannot become the rendered board', () => {
 
 test('socket URLs follow page encryption and contain no participant token', () => {
   assert.equal(roomSocketUrl('http://192.168.0.10:5173', 'ABCDEF'), 'ws://192.168.0.10:5173/ws/rooms/ABCDEF')
-  assert.equal(roomSocketUrl('https://nollja.example', 'ABCDEF'), 'wss://nollja.example/ws/rooms/ABCDEF')
+  assert.equal(roomSocketUrl('https://nolja.example', 'ABCDEF'), 'wss://nolja.example/ws/rooms/ABCDEF')
 })

@@ -1,7 +1,7 @@
 import { isRoomSnapshot } from '../model/roomSnapshot.ts'
 import type { Room, RoomSession } from '../types.ts'
 
-const key = (code: string) => `nollja:recovery:${code}`
+const key = (code: string) => `nolja:recovery:${code}`
 
 // 마지막 확인된 보드는 복구 중 읽기 전용 표시용입니다. 서버 인증 전에는 절대로 착수에 사용하지 않습니다.
 export function readRoomSnapshot(code: string, session: RoomSession): Room | undefined {

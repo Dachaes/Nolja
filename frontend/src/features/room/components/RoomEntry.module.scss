@@ -16,7 +16,7 @@
 // 작은 소개 문구, 제목, 설명 순으로 글자 크기와 색상의 위계를 만듭니다.
 .eyebrow { color: var(--color-primary-hover); font-size: 12px; margin-bottom: 10px; }
 .card h2 { font-size: 25px; font-weight: 650; letter-spacing: -.7px; }
-.description { margin-top: 12px; font-size: 14px; color: var(--color-muted); line-height: 1.7; overflow-wrap: anywhere; }
+.description { margin-top: 12px; margin-bottom: 16px; font-size: 14px; color: var(--color-muted); line-height: 1.7; overflow-wrap: anywhere; }
 // 방 코드와 내 돌 색상을 폼 앞에서 안내합니다. 코드는 자간을 벌려 읽기 쉽게 합니다.
 .code { margin: 18px 0 30px; font-size: 12px; color: var(--color-muted); strong { margin-left: 6px; color: var(--color-text); letter-spacing: 1px; } }
 // 조회 중/오류/정원 초과 안내를 동일한 메시지 영역에 표시합니다.
@@ -24,5 +24,5 @@
 // 재시도와 새 방 이동은 폼 제출보다 덜 강조되는 텍스트 버튼입니다.
 .message button, .back { padding: 12px; border: 0; border-radius: 6px; background: transparent; color: var(--color-primary-hover); font-size: 13px; }
 .back { margin-top: 15px; }
-// 로그인 없이 참여할 수 있음을 폼 아래에서 안내합니다.
+// 입장 안내 문구를 폼 아래에 표시합니다.
 .footer { margin-top: 26px; font-size: 12px; color: var(--color-muted); }

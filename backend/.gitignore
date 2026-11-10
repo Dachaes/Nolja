@@ -1,33 +1,48 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Maven 빌드 결과와 IDE의 컴파일 결과입니다.
+/target/
+/out/
+*.class
 
-### STS ###
-.apt_generated
+# 서버 로그, 프로세스 ID, JVM 오류 보고서와 메모리 덤프입니다.
+/logs/
+*.log
+*.log.*
+*.pid
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# 환경변수와 개인용 Spring local 프로필 설정은 제외합니다.
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.template
+application-local.properties
+application-local.yml
+application-local.yaml
+
+# 과거 로컬 DB 파일과 백업은 기능 제거 후에도 실수로 커밋하지 않도록 제외합니다.
+/data/
+/pgdata/
+/postgres-data/
+/backups/
+/compose.override.yaml
+/compose.override.yml
+/docker-compose.override.yaml
+/docker-compose.override.yml
+
+# Eclipse / Spring Tool Suite에서 자동 생성하는 개인 프로젝트 정보입니다.
+.apt_generated/
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
-.sts4-cache
+.sts4-cache/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# Spring Initializr의 기본 안내 파일입니다. 프로젝트 README.md는 포함합니다.
+/HELP.md
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
+# pom.xml, mvnw, mvnw.cmd, .mvn/wrapper/와 공통 application.properties는 Git에 포함합니다.

@@ -5,7 +5,7 @@
   text-align: left;
   gap: 9px;
 
-  label { font-size: 13px; font-weight: 600; }
+  label { font-size: 13px; font-weight: 500; margin-left: 4px; }
 
   // 입력 필드는 폼 너비를 채우고, aria-invalid 상태와 오류 테두리를 연결합니다.
   input {
@@ -24,8 +24,8 @@
 }
 
 // 기본 입력 안내와 오류를 글자색으로 구분합니다. 실제 오류 문구도 함께 제공됩니다.
-.help { font-size: 11px; color: var(--color-muted); }
-.error { font-size: 12px; color: var(--color-error); line-height: 1.6; }
+.help { font-size: 11px; color: var(--color-muted); margin-left: 4px; }
+.error { font-size: 12px; color: var(--color-error); line-height: 1.6; margin-left: 4px; }
 
 // 요청 중 비활성 상태를 흐리게 표시하고 활성 버튼에만 hover 효과를 적용합니다.
 .submit {

@@ -35,11 +35,12 @@ export function RoomEntry({ code, onAdmitted }: { code?: string; onAdmitted: (ad
         <div className={styles.discs} aria-hidden="true"><Disc color="black" /><Disc color="white" /></div>
         <p className={styles.eyebrow}>{code ? '둘이서, 오셀로' : '오셀로 로비'}</p>
         <h2>{code ? '친구가 기다리고 있어요' : '우리, 한 판 놀까요?'}</h2>
+        {!code && <p className={styles.code}>방을 만든 사람은 흑돌 · 흑이 먼저 둡니다</p>}
         <p className={styles.description}>
-          {code ? `${preview.data?.hostNickname ?? '친구'}님의 방에 입장해요.` : '닉네임을 정하고 친구를 초대해 보세요.'}
+          {code ? `${preview.data?.hostNickname ?? '친구'}님의 방에 입장해요.` : ''}
         </p>
         {code && <p className={styles.code}>방 코드 <strong>{code}</strong> · 나는 백돌</p>}
-        {!code && <p className={styles.code}>방을 만든 사람은 흑돌 · 흑이 먼저 둡니다</p>}
+        
         {/* 로딩, 통신 오류, 정원 초과를 구분해 사용자가 다음 행동을 판단할 수 있게 합니다. */}
         {code && preview.isPending && <p className={styles.message} role="status">방을 확인하는 중…</p>}
         {preview.isError && <div className={styles.message} role="alert">
@@ -48,9 +49,10 @@ export function RoomEntry({ code, onAdmitted }: { code?: string; onAdmitted: (ad
         </div>}
         {full && !preview.isError && <p className={styles.message} role="alert">이미 두 사람이 참여한 방입니다.</p>}
         {!code && <ResumeRoom />}
+        {/* 방 상태 확인 후 바로 닉네임 폼을 표시합니다. 참가 인증은 입장 시 발급되는 토큰으로 처리합니다. */}
         {ready && <NicknameForm submitLabel={code ? '방 입장하기' : '방 만들기'} onSubmit={enter} />}
-        {code && <button type="button" className={styles.back} onClick={() => navigate('/')}>새 방 만들러 가기</button>}
-        <p className={styles.footer}>로그인 없이, 각자의 기기에서 함께해요.</p>
+        <button type="button" className={styles.back} onClick={() => navigate('/')}>로비로 돌아가기</button>
+        <p className={styles.footer}>각자의 기기에서 함께해요.</p>
       </main>
     </div>
   )

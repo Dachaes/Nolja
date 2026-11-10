@@ -1,4 +1,4 @@
-# NOLLJA 오셀로 기본 색상
+# Doran(도란) 오셀로 기본 색상
 
 첨부 UI를 기준으로 따뜻한 밝은 배경, 세이지 그린 보드, 차분한 블루를 사용합니다.
 실제 색상 토큰은 `frontend/src/styles/global.module.scss`의 `:root`에서 관리합니다.

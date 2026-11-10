@@ -1,1 +1,31 @@
-.tools/
+# 프로젝트에서 내려받은 로컬 JDK와 작업용 임시 도구입니다.
+/.tools/
+
+# Vercel CLI가 생성하는 개인 프로젝트 연결 정보입니다.
+.vercel/
+
+# 루트에서 실행할 때 만드는 로컬 환경 변수도 Git에 포함하지 않습니다.
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.template
+
+# 운영체제가 자동으로 만드는 파일입니다.
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 개인 IDE 설정은 제외하고 확장 프로그램 추천 목록만 공유합니다.
+.idea/
+**/.vscode/*
+!**/.vscode/extensions.json
+*.iml
+*.iws
+*.ipr
+
+# 편집기가 만드는 임시 파일과 백업입니다.
+*.swp
+*.swo
+*~

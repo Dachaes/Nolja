@@ -8,7 +8,7 @@ export function PlayerPanel({ players, currentTurn, myPlayerId }: { players: Pla
     {players.map(player => <div key={player.playerId}
       className={`${styles.player} ${currentTurn === player.color ? styles.active : ''}`}
       aria-label={`${player.nickname}, ${player.color === 'black' ? '흑' : '백'}${currentTurn === player.color ? ', 현재 차례' : ''}`}>
-      <Disc color={player.color} small /><span>{player.nickname}{player.playerId === myPlayerId ? ' (나)' : ''}</span>
+      <Disc color={player.color} small /><span className={styles.nickname}>{player.nickname}{player.playerId === myPlayerId ? ' (나)' : ''}</span>
     </div>)}
   </div>
 }

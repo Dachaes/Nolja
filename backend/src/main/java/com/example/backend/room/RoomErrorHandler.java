@@ -9,7 +9,7 @@ import com.example.backend.room.RoomDtos.ApiError;
 
 // 방 컨트롤러에서 발생한 예외를 통일된 JSON 응답으로 변환합니다.
 // 각 API 메서드에서 동일한 try/catch와 응답 작성 코드를 반복하지 않아도 됩니다.
-@RestControllerAdvice(assignableTypes = RoomController.class)
+@RestControllerAdvice(basePackages = "com.example.backend")
 public class RoomErrorHandler {
     // 정원 초과/만료/인증 실패처럼 예상한 오류는 서비스가 지정한 상태와 문구를 그대로 전달합니다.
     @ExceptionHandler(RoomException.class)

@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // 브라우저 테스트는 별도 서버 포트로 실행할 수 있습니다. 일반 개발은 기존 8080을 사용합니다.
-const backendTarget = process.env.NOLLJA_API_TARGET ?? 'http://127.0.0.1:8080'
+const backendTarget = process.env.NOLJA_API_TARGET ?? 'http://127.0.0.1:8080'
 
 // 개발 서버와 프로덕션 번들에 공통으로 적용되는 Vite 설정입니다.
 export default defineConfig({

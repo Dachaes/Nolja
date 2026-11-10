@@ -63,4 +63,5 @@ public class RoomController {
     private String bearer(String authorization) {
         return authorization != null && authorization.startsWith("Bearer ") ? authorization.substring(7) : null;
     }
+
 }

@@ -4,7 +4,7 @@ import type { Room, RoomSession } from '../../../src/features/room/types'
 
 // 실제 폼으로 두 기기를 입장시킵니다. 테스트별로 독립된 브라우저 context를 만들어 호출합니다.
 export async function enterGame(host: Page, guest: Page) {
-  await host.goto('/')
+  await host.goto('/games/othello')
   await host.getByLabel('닉네임', { exact: true }).fill('민서')
   await host.getByRole('button', { name: '방 만들기', exact: true }).click()
   await expect(host.getByText('실시간 연결됨', { exact: true })).toBeVisible()
@@ -17,7 +17,7 @@ export async function enterGame(host: Page, guest: Page) {
 
 // 참가 토큰은 테스트 로그에 출력하지 않고 해당 기기의 정상 요청에만 사용합니다.
 export async function sessionOf(page: Page, code: string): Promise<RoomSession> {
-  return page.evaluate(roomCode => JSON.parse(sessionStorage.getItem(`nollja:room:${roomCode}`)!), code)
+  return page.evaluate(roomCode => JSON.parse(sessionStorage.getItem(`nolja:room:${roomCode}`)!), code)
 }
 
 // 종료 준비에 수십 번의 클릭을 반복하지 않도록 실제 착수 API를 사용합니다.
@@ -40,7 +40,8 @@ export async function finishGame(host: Page, guest: Page, seed = 42): Promise<Ro
     // 고정된 난수 수순으로 같은 실패를 재현할 수 있게 합니다.
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0
     const move = moves[seed % moves.length]
-    const response = await host.request.post(`${origin}/api/rooms/${code}/moves`, {
+    const device = session.playerId === hostSession.playerId ? host : guest
+    const response = await device.request.post(`${origin}/api/rooms/${code}/moves`, {
       headers: { Authorization: `Bearer ${session.token}` }, data: { ...move, revision: room.revision },
     })
     expect(response.ok()).toBe(true)

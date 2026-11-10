@@ -2,8 +2,8 @@ import type { RoomSession } from '../types'
 import { clearRoomSnapshot } from '../recovery/recoveryStorage.ts'
 
 // 방마다 저장 키를 나눠 다른 방의 참가 정보가 섞이지 않게 합니다.
-const key = (code: string) => `nollja:room:${code}`
-const activeRoomKey = 'nollja:active-room'
+const key = (code: string) => `nolja:room:${code}`
+const activeRoomKey = 'nolja:active-room'
 
 // sessionStorage는 탭 단위이며 같은 탭의 새로고침 후에도 남아 있습니다.
 // 탭 복제 시에는 브라우저가 값을 복사할 수 있으므로 두 기기 테스트는 별도 브라우저 세션을 씁니다.
@@ -34,6 +34,14 @@ export function readActiveRoom(): string | null {
   } catch { return null }
 }
 
+// 복귀 안내를 닫으면 같은 탭에서 새로고침해도 다시 표시하지 않습니다.
+// 참가 토큰은 보관하므로 기존 초대 주소를 직접 열면 여전히 방으로 복귀할 수 있습니다.
+export function dismissRoomRecovery(code: string) {
+  try {
+    if (sessionStorage.getItem(activeRoomKey) === code) sessionStorage.removeItem(activeRoomKey)
+  } catch { /* 저장소가 차단돼도 현재 화면에서는 안내를 닫을 수 있습니다. */ }
+}
+
 // 퇴장할 때 해당 방 정보만 제거합니다. 다른 방과 기억해 둔 닉네임에는 영향을 주지 않습니다.
 export function clearSession(code: string) {
   clearRoomSnapshot(code)
@@ -45,10 +53,10 @@ export function clearSession(code: string) {
 
 // 닉네임은 편의를 위한 입력값일 뿐 인증 정보가 아니므로 localStorage에 별도로 기억합니다.
 export function rememberedNickname() {
-  try { return localStorage.getItem('nollja:nickname') ?? '' } catch { return '' }
+  try { return localStorage.getItem('nolja:nickname') ?? '' } catch { return '' }
 }
 
 // 입장에 성공한 이름만 다음 입력의 기본값으로 사용합니다.
 export function rememberNickname(nickname: string) {
-  try { localStorage.setItem('nollja:nickname', nickname) } catch { /* 선택적인 편의 기능이므로 저장 실패로 게임을 막지 않습니다. */ }
+  try { localStorage.setItem('nolja:nickname', nickname) } catch { /* 선택적인 편의 기능이므로 저장 실패로 게임을 막지 않습니다. */ }
 }

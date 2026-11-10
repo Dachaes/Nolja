@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test'
 
 // 필요하면 테스트 전용 포트를 지정해 개발자가 실행 중인 서버와 분리합니다.
-const baseURL = process.env.NOLLJA_E2E_BASE_URL ?? 'http://127.0.0.1:5173'
+const baseURL = process.env.NOLJA_E2E_BASE_URL ?? 'http://127.0.0.1:5173'
 const port = new URL(baseURL).port || '5173'
 
 // 실제 브라우저로 사용자 흐름을 검증하는 E2E 테스트 설정입니다.

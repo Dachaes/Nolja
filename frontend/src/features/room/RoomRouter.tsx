@@ -5,6 +5,7 @@ import { saveSession } from './model/session'
 import { RoomPage } from './RoomPage'
 import type { Admission } from './types'
 import styles from './RoomPage.module.scss'
+import { HomePage } from '../home/HomePage'
 
 // 별도 라우팅 라이브러리 없이 홈(/)과 초대 주소(/room/:code)를 구분합니다.
 export function RoomRouter() {
@@ -28,7 +29,8 @@ export function RoomRouter() {
   }
 
   // RoomPage의 key가 달라지면 이전 방의 React 상태를 버리고 새 방 상태로 시작합니다.
-  if (pathname === '/') return <RoomEntry onAdmitted={admitted} />
+  if (pathname === '/') return <HomePage />
+  if (pathname === '/games/othello') return <RoomEntry onAdmitted={admitted} />
   if (match) {
     const code = match[1].toUpperCase()
     return <RoomPage key={code} code={code} initialSession={created?.room.code === code ? created : undefined} onHome={home} />
