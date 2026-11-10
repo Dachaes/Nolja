@@ -1,0 +1,36 @@
+// 보드는 최대 400px로 제한하고 화면이 좁아지면 좌우 여백을 남기며 줄어듭니다.
+// 하단 safe-area는 모바일 홈 표시 영역과 내용이 겹치지 않게 합니다.
+.game {
+  width: min(100% - 40px, 400px);
+  margin: 28px auto 0;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
+
+// 자동 패스처럼 게임 진행 중 전달할 안내를 보드 위에 표시합니다.
+.notice {
+  margin: -5px 0 15px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+// 화면에서는 숨기되 스크린리더가 상태를 읽을 수 있도록 남깁니다. display:none과 다릅니다.
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+// 휴대폰에서는 바깥 여백을 줄여 보드에 더 많은 가로 공간을 제공합니다.
+@media (max-width: 480px) {
+  .game { width: calc(100% - 32px); max-width: 400px; margin-top: 20px; }
+}

@@ -1,0 +1,24 @@
+// 대국 종료 시 보드 위에 나타나는 결과 카드입니다. 배경/테두리는 다른 패널과 같은 토큰을 씁니다.
+.result {
+  margin-bottom: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+
+  h2 { margin-top: 6px; font-size: 23px; font-weight: 650; }
+}
+
+// 승패 → 참가자별 점수 → 다음 행동 순서로 읽을 수 있도록 정보 크기와 여백을 나눕니다.
+.eyebrow { color: var(--color-primary-hover); font-size: 12px; }
+.description { margin-top: 8px; color: var(--color-muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.scores { display: grid; grid-template-columns: 1fr 1fr; margin: 18px 0; }
+.player {
+  display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 7px;
+  padding: 0 8px;
+  & + & { border-left: 1px solid var(--color-border); }
+  strong { font-size: 30px; font-variant-numeric: tabular-nums; }
+}
+.disc { display: block; width: 22px; height: 22px; }
+.name { font-size: 13px; overflow-wrap: anywhere; max-width: 100%; }

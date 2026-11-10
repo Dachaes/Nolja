@@ -1,0 +1,17 @@
+// 연결 안내는 기존 패널과 같은 색상을 사용하고 좁은 화면에서도 문장을 줄바꿈합니다.
+.notice {
+  width: min(100% - 32px, 400px);
+  margin: 16px auto;
+  padding: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  button { margin-top: 12px; padding: 10px 16px; border: 0; border-radius: 8px; background: var(--color-primary); color: var(--color-on-primary); }
+}
+.help { margin-top: 6px; color: var(--color-muted); font-size: 12px; }
+.countdown { margin-top: 8px; color: var(--color-primary-hover); font-variant-numeric: tabular-nums; }

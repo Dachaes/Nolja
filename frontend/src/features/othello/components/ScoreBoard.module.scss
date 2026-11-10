@@ -1,0 +1,13 @@
+// 점수와 차례 배지를 한 줄의 패널로 배치합니다.
+.scoreboard { display: flex; align-items: center; justify-content: center; gap: 28px; min-height: 49px; margin: 14px 8px 20px; padding: 7px 12px; border: 1px solid var(--color-border); border-radius: 10px; }
+// tabular-nums로 숫자 폭을 일정하게 만들어 점수가 바뀔 때 덜 흔들리도록 합니다.
+.score { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; }
+// 점수 사이의 구분 문자와 세로 구분선은 보조 색상으로 표시합니다.
+.dash { font-size: 16px; color: var(--color-muted); font-weight: 400; }
+.divider { width: 1px; height: 24px; background: var(--color-border); }
+// 문구 길이에 따른 배지 크기 변화를 줄이고 줄바꿈을 막습니다.
+.turn { min-width: 80px; text-align: center; padding: 5px 9px; background: var(--color-primary); color: var(--color-on-primary); border-radius: 6px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+// 좁은 화면에서는 간격/글자 크기를 줄이되 점수와 차례는 한 줄로 유지합니다.
+@media (max-width: 480px) { .scoreboard { gap: 20px; margin: 13px 0 20px; } .score { gap: 8px; font-size: 20px; } .turn { min-width: 72px; } }
+// 특히 작은 휴대폰 너비에서 패널 내부 간격을 한 번 더 줄입니다.
+@media (max-width: 340px) { .scoreboard { gap: 12px; } }

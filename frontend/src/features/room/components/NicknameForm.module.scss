@@ -1,0 +1,43 @@
+// 라벨·입력·설명·오류·제출 버튼을 세로로 배치하는 폼입니다.
+.form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 9px;
+
+  label { font-size: 13px; font-weight: 600; }
+
+  // 입력 필드는 폼 너비를 채우고, aria-invalid 상태와 오류 테두리를 연결합니다.
+  input {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 15px;
+
+    &::placeholder { color: var(--color-muted); }
+    &[aria-invalid='true'] { border-color: var(--color-error); }
+  }
+}
+
+// 기본 입력 안내와 오류를 글자색으로 구분합니다. 실제 오류 문구도 함께 제공됩니다.
+.help { font-size: 11px; color: var(--color-muted); }
+.error { font-size: 12px; color: var(--color-error); line-height: 1.6; }
+
+// 요청 중 비활성 상태를 흐리게 표시하고 활성 버튼에만 hover 효과를 적용합니다.
+.submit {
+  min-height: 46px;
+  margin-top: 15px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 600;
+  font-size: 14px;
+
+  &:enabled:hover { background: var(--color-primary-hover); }
+  &:disabled { opacity: .65; }
+}

@@ -2,18 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<!-- Spring Boot가 권장하는 의존성 버전과 Maven 기본 설정을 부모 프로젝트에서 가져옵니다. -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.1.2</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/> <!-- 로컬 상위 폴더 대신 Maven 저장소에서 부모 설정을 찾습니다. -->
 	</parent>
+	<!-- Maven 저장소와 빌드 결과에서 이 프로젝트를 식별하는 그룹, 이름, 버전입니다. -->
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backend</name>
 	<description/>
 	<url/>
+	<!-- 배포 메타데이터 자리입니다. 현재 앱의 실행 로직에는 영향을 주지 않습니다. -->
 	<licenses>
 		<license/>
 	</licenses>
@@ -26,22 +29,32 @@
 		<tag/>
 		<url/>
 	</scm>
+	<!-- record 등 Java 21 환경을 기준으로 컴파일합니다. 실행 JDK도 해당 버전을 준비합니다. -->
 	<properties>
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
+		<!-- REST 컨트롤러, JSON 처리, 내장 서블릿 서버를 제공하는 웹 기능 묶음입니다. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 
+		<!-- 방 상태가 바뀌면 연결된 두 기기에 즉시 전달하는 WebSocket 서버입니다. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<!-- 테스트에서만 사용하므로 실제 앱 실행 의존성에는 포함하지 않습니다. -->
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
+	<!-- spring-boot:run 실행과 실행 가능한 애플리케이션 패키징을 지원합니다. -->
 	<build>
 		<plugins>
 			<plugin>

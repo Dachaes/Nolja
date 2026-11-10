@@ -1,0 +1,48 @@
+// 보드 아래 조작 영역을 가운데 정렬합니다.
+.actions {
+  padding: 0 16px;
+  text-align: center;
+}
+
+// 체크박스와 설명을 하나의 클릭 가능한 라벨처럼 정렬합니다.
+.hints {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 15px 0 20px;
+  color: var(--color-muted);
+  font-size: 12px;
+  cursor: pointer;
+
+  // 브라우저 기본 체크박스를 사용하고 accent-color로 브랜드 색상만 맞춥니다.
+  input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--color-primary);
+  }
+}
+
+// 방 나가기는 보조 동작이므로 배경 없는 텍스트 버튼으로 표현하되 클릭 높이는 확보합니다.
+.leave {
+  min-height: 44px;
+  padding: 10px 18px;
+  margin-top: 1px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-muted);
+
+  &:hover {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+// 작은 화면에서는 안쪽 여백을 줄입니다.
+@media (max-width: 480px) {
+  .actions { padding: 0 6px; }
+}

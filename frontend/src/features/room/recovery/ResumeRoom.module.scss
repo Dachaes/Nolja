@@ -1,0 +1,12 @@
+// 새 방 생성과 구분되는 복귀 카드입니다. 비밀 토큰은 표시하지 않고 공개 방 코드만 보여줍니다.
+.resume {
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-primary);
+  border-radius: 10px;
+  background: var(--color-surface);
+  font-size: 13px;
+  line-height: 1.6;
+  strong { display: block; margin-top: 4px; letter-spacing: 1px; }
+  button { margin-top: 12px; padding: 10px 16px; border: 0; border-radius: 8px; background: var(--color-primary); color: var(--color-on-primary); }
+}

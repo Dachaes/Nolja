@@ -1,4 +1,6 @@
 {
+  // tsconfig는 주석을 허용하는 JSONC 형식입니다. package.json 같은 일반 JSON과 다릅니다.
+  // 이 파일이 직접 코드를 검사하지 않고 브라우저 앱/Node 설정의 두 프로젝트를 묶습니다.
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

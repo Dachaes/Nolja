@@ -1,26 +1,34 @@
 {
   "compilerOptions": {
+    // 이전 검사 결과를 저장해 반복 빌드의 타입 검사 시간을 줄입니다.
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    // 앱에서 사용하는 JavaScript와 브라우저 DOM의 타입 정의를 선택합니다.
     "target": "es2023",
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
+    // Vite의 정적 자산/CSS Modules import 등에 필요한 타입을 제공합니다.
     "types": ["vite/client"],
     "allowArbitraryExtensions": true,
+    // 설치된 라이브러리의 선언 파일 내부 검사 비용을 줄입니다. 앱 코드의 타입 검사는 수행합니다.
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    // 모듈 경로 해석은 번들러 기준입니다. import type과 런타임 import를 구분해 유지합니다.
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+    // TypeScript는 타입 검사만 하고 실제 JS/CSS 묶음 생성은 Vite가 담당합니다.
     "noEmit": true,
+    // React의 자동 JSX 변환을 사용하므로 JSX만을 위해 React 기본 import를 추가하지 않아도 됩니다.
     "jsx": "react-jsx",
 
-    /* Linting */
+    // 사용하지 않는 변수/매개변수, switch의 의도하지 않은 다음 분기 실행을 잡습니다.
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    // 타입 정보 제거만으로 실행 가능한 TS 문법을 사용하도록 제한합니다.
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
+  // 사용자에게 전달되는 앱 소스만 이 설정으로 검사합니다.
   "include": ["src"]
 }

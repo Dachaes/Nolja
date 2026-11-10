@@ -1,0 +1,22 @@
+// 게임 조작 영역과 접이식 규칙 설명을 선으로 구분합니다.
+.rules {
+  margin: 13px 8px 0;
+  border-top: 1px solid var(--color-border);
+  padding-top: 17px;
+  font-size: 12px;
+  color: var(--color-muted);
+  line-height: 1.8;
+
+  // 브라우저 기본 펼치기 표시는 유지하고 제목 영역만 가운데 정렬합니다.
+  summary {
+    width: fit-content;
+    margin: 0 auto;
+    cursor: pointer;
+    &:hover { color: var(--color-text); }
+  }
+
+  // 여러 규칙을 읽기 쉽도록 목록 들여쓰기와 항목 사이 간격을 맞춥니다.
+  ul { padding-left: 18px; margin: 16px 0 12px; }
+  li + li { margin-top: 7px; }
+  p { font-size: 11px; }
+}

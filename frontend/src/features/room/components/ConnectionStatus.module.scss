@@ -1,0 +1,14 @@
+// 기존 색상 토큰으로 연결 상태를 표시하며 보드의 주의를 과하게 빼앗지 않게 작게 배치합니다.
+.connection {
+  min-height: 24px;
+  margin: 14px auto 0;
+  width: min(100% - 32px, 400px);
+  color: var(--color-muted);
+  text-align: center;
+  font-size: 12px;
+
+  p { display: inline-flex; align-items: center; gap: 7px; }
+  button { margin-left: 10px; padding: 7px; border: 0; border-radius: 5px; background: transparent; color: var(--color-primary-hover); font: inherit; text-decoration: underline; }
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-muted); }
+.connected .dot { background: var(--color-hint); }

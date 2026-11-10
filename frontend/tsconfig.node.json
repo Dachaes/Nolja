@@ -1,23 +1,27 @@
 {
   "compilerOptions": {
+    // 브라우저 앱과 별도의 증분 검사 결과 파일을 사용합니다.
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "es2023",
     "lib": ["ES2023"],
+    // Vite 설정은 브라우저가 아닌 Node.js에서 실행되므로 Node 전역/API 타입을 사용합니다.
     "types": ["node"],
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    // Node의 ESM/CJS 경로 해석 규칙을 적용하고 import 표현을 유지합니다.
     "module": "nodenext",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+    // 설정 파일도 타입 검사만 수행하며 별도 JavaScript 파일은 출력하지 않습니다.
     "noEmit": true,
 
-    /* Linting */
+    // 앱과 마찬가지로 미사용 코드, 타입 제거로 처리할 수 없는 문법, switch fallthrough를 검사합니다.
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
+  // 현재 Node용 타입 검사 범위는 Vite 설정 파일입니다. E2E 실행 설정과는 별개입니다.
   "include": ["vite.config.ts"]
 }

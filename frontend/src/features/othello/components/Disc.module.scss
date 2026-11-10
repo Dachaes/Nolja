@@ -1,0 +1,26 @@
+// 칸 너비에 비례하는 원형 돌입니다. 외부 그림자와 안쪽 빛으로 두께를 표현합니다.
+// rgb(from ...)은 기존 색상 토큰을 유지하면서 투명도만 바꾸는 상대 색상 문법입니다.
+.disc {
+  display: inline-grid;
+  place-items: center;
+  width: 76%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgb(from var(--color-shadow) r g b / 24%), inset 0 1px 1px rgb(from var(--color-white) r g b / 18%);
+  pointer-events: none;
+  animation: appear 180ms ease-out;
+}
+// 원형 그라데이션의 밝은 지점을 왼쪽 위에 배치해 흑돌과 백돌의 광원 방향을 맞춥니다.
+.black { background: radial-gradient(circle at 35% 25%, var(--color-black-highlight), var(--color-black) 78%); }
+.white {
+  background: radial-gradient(circle at 35% 25%, var(--color-white) 35%, var(--color-white-shadow));
+  border: 1px solid rgb(from var(--color-black) r g b / 28%);
+}
+// 점수판과 참가자 영역에서는 보드 비율 대신 고정 크기를 사용합니다.
+.small { width: 19px; flex-shrink: 0; }
+// 가장 최근에 놓인 돌 중앙의 작은 파란 점입니다.
+.lastMove { width: 15%; aspect-ratio: 1; border-radius: 50%; background: var(--color-primary); }
+// 돌이 놓이거나 색상이 바뀔 때 잠깐 커지며 나타나도록 합니다.
+@keyframes appear { from { transform: scale(.85); opacity: .7; } to { transform: scale(1); opacity: 1; } }
+// 움직임에 민감한 사용자의 시스템 설정에 따라 애니메이션을 생략합니다.
+@media (prefers-reduced-motion: reduce) { .disc { animation: none; } }

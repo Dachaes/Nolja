@@ -1,0 +1,27 @@
+// 친구를 기다리는 대기실을 최대 360px 너비의 중앙 영역으로 표시합니다.
+.waiting { width: min(100% - 40px, 360px); margin: 64px auto 0; padding-bottom: 40px; text-align: center; }
+// 방 생성 안내, 제목, 설명의 시각적 우선순위를 나눕니다.
+.eyebrow { font-size: 12px; color: var(--color-primary-hover); margin-bottom: 10px; }
+.waiting h2 { font-size: 25px; font-weight: 650; }
+.description { margin-top: 14px; line-height: 1.8; font-size: 14px; color: var(--color-muted); }
+// 방장과 빈 상대 자리를 위아래 카드로 보여줍니다.
+.players { display: flex; flex-direction: column; gap: 12px; margin: 32px 0; }
+// 돌·닉네임·방장 표시를 가로 배치합니다. 닉네임은 말줄임하고 상태 표시는 줄어들지 않게 합니다.
+.player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 17px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  text-align: left;
+  font-size: 14px;
+  min-width: 0;
+
+  > span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  small { margin-left: auto; flex-shrink: 0; color: var(--color-muted); font-size: 11px; }
+}
+// 아직 참가자가 없는 자리를 점선으로 구분합니다.
+.empty { color: var(--color-muted); border-style: dashed; }
+// 초대보다 덜 강조되는 방 나가기 버튼입니다. 터치 영역은 충분히 유지합니다.
+.leave { min-height: 44px; margin-top: 16px; padding: 12px 18px; border: 0; border-radius: 6px; background: transparent; color: var(--color-muted); font-size: 13px; }

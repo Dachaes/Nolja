@@ -1,0 +1,54 @@
+// CSS Modules는 클래스 이름을 파일별로 분리합니다. :global은 예외적으로 앱 전체에 적용합니다.
+// 색상 토큰은 여기서 한 번 정의하고 각 컴포넌트가 var(...)로 참조합니다. 색상표는 루트 color.md입니다.
+:global(:root) {
+  --color-background: #f3f0ed;
+  --color-surface: #f7f4f1;
+  --color-text: #414440;
+  --color-muted: #747670;
+  --color-border: #d5d0ca;
+  // 보드의 바탕·그라데이션·격자에 사용할 색상 묶음입니다.
+  --color-board: #a2b39a;
+  --color-board-light: #adbea5;
+  --color-board-dark: #96a88e;
+  --color-grid: #5b6c54;
+  // 흑돌/백돌의 밝은 면과 어두운 면을 구분해 입체감을 만듭니다.
+  --color-black: #282e28;
+  --color-black-highlight: #3c4339;
+  --color-white: #f9f8f2;
+  --color-white-shadow: #e3e3d9;
+  // 주요 버튼·포커스·상태 표시와 오류 안내에서 공유하는 색상입니다.
+  --color-primary: #678ba1;
+  --color-primary-hover: #53778d;
+  --color-on-primary: #ffffff;
+  --color-hint: #536a4b;
+  --color-shadow: #242b23;
+  --color-error: #a14f44;
+
+  // 설치된 글꼴 중 앞에서부터 사용합니다. 별도의 웹폰트 다운로드를 요청하지 않습니다.
+  font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Malgun Gothic', sans-serif;
+  color: var(--color-text);
+  background: var(--color-background);
+  // 시스템 다크 모드에서도 밝은 보드 디자인을 유지합니다.
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// padding과 border를 선언한 너비에 포함하고 기본 여백/입력 글꼴을 맞추는 공통 초기화입니다.
+:global(*) { box-sizing: border-box; }
+:global(body) { margin: 0; min-width: 280px; }
+:global(button), :global(input) { font: inherit; }
+:global(button) { -webkit-tap-highlight-color: transparent; }
+:global(button:enabled) { cursor: pointer; }
+// 키보드로 이동할 때 포커스 위치를 분명히 표시합니다. outline은 요소 크기를 바꾸지 않습니다.
+:global(button:focus-visible), :global(input:focus-visible), :global(summary:focus-visible) {
+  outline: 3px solid var(--color-primary-hover);
+  outline-offset: 4px;
+}
+:global(button:disabled) { cursor: not-allowed; }
+:global(h1), :global(h2), :global(p) { margin: 0; }
+// svh는 모바일 브라우저 주소창이 보일 때의 작은 뷰포트 높이를 기준으로 합니다.
+:global(#root) { min-height: 100svh; }
