@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import './styles/global.module.scss'
+import './styles/global.scss'
 import App from './App.tsx'
 
 // 서버에서 받은 방 정보를 캐시하는 저장소입니다.
