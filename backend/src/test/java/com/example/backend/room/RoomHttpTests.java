@@ -79,8 +79,34 @@ class RoomHttpTests {
     }
 
     // 테스트 요청의 공통 구성입니다. 본문/토큰이 있는 경우에만 관련 헤더를 붙입니다.
+    @Test
+    void gameScopedRoutesCreateOnlyTheirGameAndRejectCrossGameSessions() throws Exception {
+        String moleBase = "/api/games/whack-a-mole/rooms";
+        String othelloBase = "/api/games/othello/rooms";
+        var created = call(hostDevice, "POST", moleBase, "{\"nickname\":\"moleHost\"}", null);
+        assertEquals(201, created.statusCode());
+        var mole = json.readTree(created.body());
+        String code = mole.path("room").path("code").asString();
+        String token = mole.path("token").asString();
+        assertEquals("whack-a-mole", mole.path("room").path("gameType").asString());
+        assertTrue(mole.path("room").path("game").isNull());
+        assertEquals(404, call(hostDevice, "GET", othelloBase + "/" + code, null, null).statusCode());
+        assertEquals(404, call(hostDevice, "POST", othelloBase + "/" + code + "/players", "{\"nickname\":\"guest\"}", null).statusCode());
+        assertEquals(404, call(hostDevice, "GET", othelloBase + "/" + code + "/state", null, token).statusCode());
+        assertEquals(404, call(hostDevice, "DELETE", othelloBase + "/" + code + "/players/me", null, token).statusCode());
+        assertEquals("waiting", rooms.state(code, token).status());
+        assertEquals(201, call(guestDevice, "POST", moleBase + "/" + code + "/players", "{\"nickname\":\"guest\"}", null).statusCode());
+        var othelloCreated = call(hostDevice, "POST", othelloBase, "{\"nickname\":\"othelloHost\"}", null);
+        assertEquals(201, othelloCreated.statusCode());
+        String otherToken = json.readTree(othelloCreated.body()).path("token").asString();
+        assertEquals(401, call(hostDevice, "GET", moleBase + "/" + code + "/state", null, otherToken).statusCode());
+        assertEquals(200, call(hostDevice, "GET", moleBase + "/" + code + "/state", null, token).statusCode());
+        assertEquals(400, call(hostDevice, "POST", moleBase, "{\"nickname\":\"host\",\"gameType\":\"othello\"}", null).statusCode());
+    }
+
     private HttpResponse<String> call(HttpClient client, String method, String path, String body, String token) throws Exception {
-        var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/rooms" + path));
+        String route = path.startsWith("/api/") ? path : "/api/rooms" + path;
+        var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + route));
         if (token != null) request.header("Authorization", "Bearer " + token);
         if (body != null) request.header("Content-Type", "application/json");
         request.method(method, body == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body));

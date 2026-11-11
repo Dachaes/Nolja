@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import styles from './InviteLink.module.scss'
+import type { GameType } from '../types'
+import { roomPath } from '../model/gameType'
 
 // 현재 접속한 서버 주소와 방 코드를 조합해 공유용 링크를 만듭니다.
-export function InviteLink({ code }: { code: string }) {
+export function InviteLink({ code, gameType }: { code: string; gameType: GameType }) {
   // origin에는 프로토콜·호스트·포트가 포함됩니다. 참가 토큰은 링크에 넣지 않습니다.
-  const link = new URL(`/room/${code}`, window.location.origin).href
+  const link = new URL(roomPath(gameType, code), window.location.origin).href
   const [feedback, setFeedback] = useState('')
   const [showLink, setShowLink] = useState(false)
 

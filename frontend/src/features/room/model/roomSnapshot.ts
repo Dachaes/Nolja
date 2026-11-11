@@ -31,7 +31,7 @@ export function isRoomSnapshot(value: unknown): value is Room {
     return room.players.length === 2 && room.status !== 'waiting' && isMoleState(room.mole, playerIds)
       && (room.status === 'closed' || room.mole.finished === (room.status === 'finished'))
   }
-  if (room.gameType !== undefined && room.gameType !== 'othello') return false
+  if (room.gameType !== 'othello') return false
   const game = room.game
   const isColor = (color: unknown) => color === null || color === 'black' || color === 'white'
   if (!game || !['playing', 'finished'].includes(game.status) || !isColor(game.currentTurn)

@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test'
 export async function controlRoomConnection(page: Page) {
   let blocked = false
   let disconnect = async () => { throw new Error('아직 연결된 소켓이 없습니다.') }
-  await page.routeWebSocket('**/ws/rooms/*', async socket => {
+  await page.routeWebSocket('**/ws/games/*/rooms/*', async socket => {
     if (blocked) { await socket.close({ code: 4000 }); return }
     const server = socket.connectToServer()
     disconnect = async () => { await Promise.all([socket.close({ code: 4000 }), server.close()]) }

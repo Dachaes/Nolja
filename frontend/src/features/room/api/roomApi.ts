@@ -1,6 +1,8 @@
 import type { Position } from '../../othello/types'
 import { backendOrigin } from '../../../config/backend'
 import type { Admission, GameType, Room, RoomPreview, RoomSession } from '../types'
+import { isGameType } from '../model/gameType'
+import { isRoomSnapshot } from '../model/roomSnapshot'
 
 // 서버의 오류 코드와 HTTP 상태를 함께 보관해 화면이 오류 종류별로 대응하게 합니다.
 // status=0은 HTTP 응답 자체를 받지 못한 네트워크 오류를 뜻합니다.
@@ -22,10 +24,12 @@ export const isTerminalError = (error: unknown) =>
 
 // 모든 방 API의 공통 통신 처리입니다. T는 호출자가 기대하는 응답 타입이며,
 // TypeScript 타입 지정 자체가 서버 JSON을 런타임에 검증해 주는 것은 아닙니다.
-async function request<T>(path: string, options: RequestInit = {}, session?: RoomSession): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}, session?: RoomSession, gameType?: GameType): Promise<T> {
   let response: Response
   try {
-    response = await fetch(`${backendOrigin}/api/rooms${path}`, {
+    const type = gameType ?? session?.gameType
+    const base = type ? `/api/games/${type}/rooms` : '/api/rooms'
+    response = await fetch(`${backendOrigin}${base}${path}`, {
       ...options,
       // 최신 보드를 받고, 외부 취소 신호 또는 8초 제한 중 먼저 오는 것을 적용합니다.
       cache: 'no-store',
@@ -53,18 +57,44 @@ async function request<T>(path: string, options: RequestInit = {}, session?: Roo
   return response.json() as Promise<T>
 }
 
+// 다른 게임/구버전 서버 응답을 성공한 입장으로 저장하거나 화면에 적용하지 않습니다.
+function checkedRoom(room: Room, gameType: GameType, code?: string): Room {
+  if (!isRoomSnapshot(room) || room.gameType !== gameType || (code && room.code !== code)) {
+    throw new RoomApiError('선택한 게임과 서버의 방 정보가 다릅니다. 새로고침 후 다시 시도해 주세요.', 'GAME_TYPE_MISMATCH', 409)
+  }
+  return room
+}
+
+async function checkedAdmission(promise: Promise<Admission>, gameType: GameType, code?: string): Promise<Admission> {
+  const admission = await promise
+  checkedRoom(admission.room, gameType, code)
+  if (!admission.room.players.some(player => player.playerId === admission.playerId) || typeof admission.token !== 'string' || !admission.token) {
+    throw new RoomApiError('참가 정보를 확인할 수 없습니다. 다시 시도해 주세요.', 'INVALID_SESSION', 401)
+  }
+  return admission
+}
+
+async function preview(code: string, gameType?: GameType, signal?: AbortSignal): Promise<RoomPreview> {
+  const room = await request<RoomPreview>(`/${encodeURIComponent(code)}`, { signal }, undefined, gameType)
+  if (!isGameType(room.gameType) || room.code !== code || (gameType && room.gameType !== gameType)) {
+    throw new RoomApiError('선택한 게임의 방이 아닙니다. 초대 링크를 확인해 주세요.', 'GAME_TYPE_MISMATCH', 409)
+  }
+  return room
+}
+
 // URL과 요청 데이터 구성을 모아 둡니다. 화면은 fetch의 세부 사항을 몰라도 됩니다.
 // create/join은 참가 토큰 발급, preview는 공개 조회, 나머지는 참가자 전용입니다.
 export const roomApi = {
-  create: (nickname: string, gameType: GameType = 'othello') => request<Admission>('', { method: 'POST', body: JSON.stringify({ nickname, gameType }) }),
+  create: (nickname: string, gameType: GameType) => checkedAdmission(request<Admission>('', { method: 'POST', body: JSON.stringify({ nickname, gameType }) }, undefined, gameType), gameType),
   hit: (code: string, session: RoomSession, hole: number, moleId: number | null, gameNumber: number) =>
-    request<Room>(`/${code}/hits`, { method: 'POST', body: JSON.stringify({ hole, moleId, gameNumber }) }, session),
-  preview: (code: string, signal?: AbortSignal) => request<RoomPreview>(`/${encodeURIComponent(code)}`, { signal }),
-  join: (code: string, nickname: string) => request<Admission>(`/${encodeURIComponent(code)}/players`, { method: 'POST', body: JSON.stringify({ nickname }) }),
-  state: (code: string, session: RoomSession, signal?: AbortSignal) => request<Room>(`/${code}/state`, { signal }, session),
+    request<Room>(`/${code}/hits`, { method: 'POST', body: JSON.stringify({ hole, moleId, gameNumber }) }, session).then(room => checkedRoom(room, session.gameType, code)),
+  preview: (code: string, gameType: GameType, signal?: AbortSignal) => preview(code, gameType, signal),
+  legacyPreview: (code: string, signal?: AbortSignal) => preview(code, undefined, signal),
+  join: (code: string, nickname: string, gameType: GameType) => checkedAdmission(request<Admission>(`/${encodeURIComponent(code)}/players`, { method: 'POST', body: JSON.stringify({ nickname }) }, undefined, gameType), gameType, code),
+  state: (code: string, session: RoomSession, signal?: AbortSignal) => request<Room>(`/${code}/state`, { signal }, session).then(room => checkedRoom(room, session.gameType, code)),
   move: (code: string, session: RoomSession, position: Position, revision: number) =>
-    request<Room>(`/${code}/moves`, { method: 'POST', body: JSON.stringify({ ...position, revision }) }, session),
+    request<Room>(`/${code}/moves`, { method: 'POST', body: JSON.stringify({ ...position, revision }) }, session).then(room => checkedRoom(room, session.gameType, code)),
   leave: (code: string, session: RoomSession) => request<void>(`/${code}/players/me`, { method: 'DELETE' }, session),
   rematch: (code: string, session: RoomSession, gameNumber: number, ready: boolean) =>
-    request<Room>(`/${code}/rematch`, { method: 'PUT', body: JSON.stringify({ gameNumber, ready }) }, session),
+    request<Room>(`/${code}/rematch`, { method: 'PUT', body: JSON.stringify({ gameNumber, ready }) }, session).then(room => checkedRoom(room, session.gameType, code)),
 }

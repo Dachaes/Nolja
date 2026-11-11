@@ -5,8 +5,8 @@ import styles from './WaitingRoom.module.scss'
 import type { GameType } from '../types'
 
 // 방장만 입장한 상태를 보여줍니다. 상대 입장 감지와 보드 전환은 상위 RoomPage가 담당합니다.
-export function WaitingRoom({ code, host, onLeave, leaving, gameType = 'othello' }: {
-  code: string; host: Player; onLeave: () => void; leaving: boolean; gameType?: GameType
+export function WaitingRoom({ code, host, onLeave, leaving, gameType }: {
+  code: string; host: Player; onLeave: () => void; leaving: boolean; gameType: GameType
 }) {
   return (
     <main className={styles.waiting}>
@@ -18,7 +18,7 @@ export function WaitingRoom({ code, host, onLeave, leaving, gameType = 'othello'
         <div className={styles.player}>{gameType === 'othello' && <Disc color="black" small />}<span>{host.nickname}</span><small>나 · 방장</small></div>
         <div className={`${styles.player} ${styles.empty}`}>{gameType === 'othello' && <Disc color="white" small />}<span>친구 입장 대기 중</span></div>
       </div>
-      <InviteLink code={code} />
+      <InviteLink code={code} gameType={gameType} />
       <button type="button" className={styles.leave} disabled={leaving} onClick={onLeave}>{leaving ? '나가는 중…' : '방 나가기'}</button>
     </main>
   )

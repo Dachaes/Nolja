@@ -15,26 +15,26 @@ export function useRoomConnection(code: string, session: RoomSession) {
   const [error, setError] = useState<RoomApiError | null>(null)
   const [serverOffset, setServerOffset] = useState(0)
   const connection = useRef<ReturnType<typeof connectRoom> | null>(null)
-  const { playerId, token } = session
+  const { playerId, token, gameType } = session
 
   useEffect(() => {
     const subscription = connectRoom({
       code,
-      session: { playerId, token },
+      session: { playerId, token, gameType },
       onRoom: room => {
-        receiveRoom(client, { playerId, token }, room)
-        saveSession(code, { playerId, token })
+        receiveRoom(client, { playerId, token, gameType }, room)
+        saveSession(code, { playerId, token, gameType })
         setServerOffset(Date.parse(room.serverTime) - Date.now())
       },
       onStatus: setStatus,
       onError: error => {
         setError(error)
-        if (isTerminalError(error)) clearSession(code)
+        if (isTerminalError(error)) clearSession(code, gameType)
       },
     })
     connection.current = subscription
     return () => { subscription.dispose(); connection.current = null }
-  }, [client, code, playerId, token])
+  }, [client, code, playerId, token, gameType])
 
   return { status, error, serverOffset, retry: () => connection.current?.retry() }
 }

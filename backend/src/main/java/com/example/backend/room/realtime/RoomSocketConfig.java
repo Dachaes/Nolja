@@ -19,6 +19,6 @@ public class RoomSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // 설정이 비어 있으면 기존의 동일 출처 검사만 적용합니다.
-        registry.addHandler(handler, "/ws/rooms/*").setAllowedOrigins(origins.allowedOrigins());
+        registry.addHandler(handler, "/ws/rooms/*", "/ws/games/*/rooms/*").setAllowedOrigins(origins.allowedOrigins());
     }
 }

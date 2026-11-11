@@ -175,11 +175,31 @@ class RoomSocketTests {
         assertFalse(message.toString().contains("token"));
     }
 
-    private Peer connect(String code) throws Exception {
+    @Test
+    void scopedSocketsRejectTheOtherGameEvenWithAValidRoomToken() throws Exception {
+        Admission mole = rooms.create("moleHost", "whack-a-mole");
+        try (Peer peer = connectPath("/ws/games/othello/rooms/" + mole.room().code())) {
+            peer.authenticate(mole.token());
+            var error = peer.next();
+            assertEquals("error", error.path("type").asString());
+            assertEquals("GAME_TYPE_MISMATCH", error.path("error").path("code").asString());
+            assertTrue(error.path("room").isNull());
+        }
+        try (Peer peer = connectPath("/ws/games/whack-a-mole/rooms/" + mole.room().code())) {
+            peer.authenticate(mole.token());
+            var state = peer.next().path("room");
+            assertEquals("whack-a-mole", state.path("gameType").asString());
+            assertTrue(state.path("game").isNull());
+        }
+    }
+
+    private Peer connect(String code) throws Exception { return connectPath("/ws/rooms/" + code); }
+
+    private Peer connectPath(String path) throws Exception {
         Peer peer = new Peer();
         peer.socket = http.newWebSocketBuilder()
                 .header("Origin", "http://localhost:" + port)
-                .buildAsync(URI.create("ws://localhost:" + port + "/ws/rooms/" + code), peer).get(3, TimeUnit.SECONDS);
+                .buildAsync(URI.create("ws://localhost:" + port + path), peer).get(3, TimeUnit.SECONDS);
         return peer;
     }
 

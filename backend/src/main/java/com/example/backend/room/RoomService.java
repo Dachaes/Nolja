@@ -77,6 +77,15 @@ public class RoomService {
         return new Admission(view(room), host.player.playerId(), host.token);
     }
 
+    public synchronized void requireGameType(String code, String gameType) {
+        if (!List.of("othello", "whack-a-mole").contains(gameType)) {
+            throw error(HttpStatus.BAD_REQUEST, "INVALID_GAME", "지원하지 않는 게임입니다.");
+        }
+        if (code != null && !gameType.equals(lookup(code).gameType)) {
+            throw error(HttpStatus.NOT_FOUND, "GAME_TYPE_MISMATCH", "선택한 게임의 방이 아닙니다. 초대 링크를 확인해 주세요.");
+        }
+    }
+
     // 초대받은 사람은 아직 토큰이 없으므로 방장 이름/정원 등 공개 정보만 제공합니다.
     public synchronized Preview preview(String code) {
         Room room = find(code);
@@ -215,7 +224,7 @@ public class RoomService {
             String nextColor = "black".equals(player.color()) ? "white" : "black";
             return new Member(new Player(player.playerId(), player.nickname(), player.userId(), nextColor), member.token);
         });
-        room.game = OthelloRules.initial();
+        room.game = "othello".equals(room.gameType) ? OthelloRules.initial() : null;
         room.status = "playing";
         if ("whack-a-mole".equals(room.gameType)) {
             room.mole = new MoleMatch(room.members.stream().map(value -> value.player.playerId()).toList(), random);
@@ -333,7 +342,7 @@ public class RoomService {
     // 반환된 배열을 호출자가 수정하더라도 실제 서버 보드가 변하면 안 됩니다.
     private RoomView view(Room room) {
         return new RoomView(room.code, room.status, room.members.stream().map(member -> member.player).toList(),
-                OthelloRules.copy(room.game), room.revision, room.expiresAt, room.gameNumber, room.rematch.snapshot(),
+                room.game == null ? null : OthelloRules.copy(room.game), room.revision, room.expiresAt, room.gameNumber, room.rematch.snapshot(),
                 room.presence.snapshot(), room.closeReason, clock.instant(), room.gameType, room.mole == null ? null : room.mole.snapshot());
     }
 
@@ -358,7 +367,10 @@ public class RoomService {
         final RoomPresence presence = new RoomPresence();
         String closeReason;
 
-        Room(String code, Instant expiresAt, String gameType) { this.code = code; this.expiresAt = expiresAt; this.gameType = gameType; }
+        Room(String code, Instant expiresAt, String gameType) {
+            this.code = code; this.expiresAt = expiresAt; this.gameType = gameType;
+            if (!"othello".equals(gameType)) this.game = null;
+        }
     }
 
 }

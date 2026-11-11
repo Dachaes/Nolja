@@ -1,4 +1,4 @@
-import type { Room } from '../types.ts'
+import type { GameType, Room } from '../types.ts'
 import { isRoomSnapshot } from '../model/roomSnapshot.ts'
 
 export type ConnectionStatus = 'connecting' | 'connected' | 'reconnecting' | 'offline' | 'closed'
@@ -20,8 +20,8 @@ export function decodeRoomMessage(raw: string): RoomSocketMessage | null {
 }
 
 // HTTPS 페이지는 암호화된 wss를 사용합니다. 토큰은 URL에 넣지 않고 첫 프레임으로만 보냅니다.
-export function roomSocketUrl(origin: string, code: string) {
-  const url = new URL('/ws/rooms/' + encodeURIComponent(code), origin)
+export function roomSocketUrl(origin: string, code: string, gameType: GameType) {
+  const url = new URL(`/ws/games/${gameType}/rooms/` + encodeURIComponent(code), origin)
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
   return url.href
 }

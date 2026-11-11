@@ -1,6 +1,6 @@
 # 두더지잡기
 
-메인페이지에서 두더지잡기를 선택하고 닉네임으로 방을 만듭니다. 초대 링크로 친구가 들어와 두 사람이 연결되면 3초 카운트다운 뒤 시작합니다. 기존 오셀로와 같은 백엔드, 방 코드, 참가 토큰, WebSocket 연결을 사용합니다.
+메인페이지에서 두더지잡기를 선택하고 닉네임으로 방을 만듭니다. 초대 링크로 친구가 들어와 두 사람이 연결되면 3초 카운트다운 뒤 시작합니다. 서버의 방 관리 기능을 공유하지만 게임별 방 주소, API, WebSocket, 참가 토큰 저장소, 상태 캐시, 복귀 안내를 구분합니다.
 
 ## 규칙
 
@@ -13,11 +13,13 @@
 
 ## API
 
-`POST /api/rooms`에 `{ "nickname": "민서", "gameType": "whack-a-mole" }`를 보냅니다. `gameType`을 생략하면 기존 오셀로 방을 만듭니다. 공개 초대 정보와 방 상태에 `gameType`이 포함됩니다.
+`POST /api/games/whack-a-mole/rooms`에 `{ "nickname": "민서", "gameType": "whack-a-mole" }`를 보냅니다. 오셀로는 `/api/games/othello/rooms`를 사용합니다. 공개 초대 정보와 방 상태의 `gameType`을 반드시 검증하며, 선택한 게임과 종류가 다르거나 누락되면 입장을 완료하지 않습니다. 경로와 본문의 게임 종류가 다른 생성 요청도 거절합니다.
 
-두더지 방의 `mole`에는 `startsAt`, `endsAt`, `pausedAt`, `finished`, 16개 `holes`, 참가자별 `scores`가 포함됩니다. 구멍은 비어 있으면 `null`, 두더지가 있으면 고유 `id`와 등장/만료 시각, 잡은 사람 `claimedBy`, 획득 점수 `points`를 가집니다.
+두더지잡기 초대 주소는 `/games/whack-a-mole/room/{code}`, 실시간 경로는 `/ws/games/whack-a-mole/rooms/{code}`입니다. 반대 게임의 방 코드로 조회·입장·소켓 인증·착수·재대결·퇴장을 시도하면 차단합니다. 기존 `/room/{code}` 링크는 서버에서 게임 종류를 확인한 뒤 올바른 주소로 이동합니다. 이전 클라이언트용 `/api/rooms`, `/ws/rooms`도 유지합니다.
 
-인증된 참가자는 `POST /api/rooms/{code}/hits`에 `{ "hole": 0, "moleId": 1, "gameNumber": 1 }`를 보냅니다. 구멍 번호는 0~15이고 빈 구멍은 `moleId: null`입니다. 참가 토큰은 기존과 같이 Authorization Bearer 헤더로 전달합니다. 점수·콤보·시간은 클라이언트에서 받지 않고 서버가 결정합니다. 다른 구멍을 동시에 누른 요청을 막지 않도록 방 revision 대신 두더지 ID와 게임 번호를 검증합니다.
+두더지 방의 `game`은 `null`이고, `mole`에는 `startsAt`, `endsAt`, `pausedAt`, `finished`, 16개 `holes`, 참가자별 `scores`가 포함됩니다. 구멍은 비어 있으면 `null`, 두더지가 있으면 고유 `id`와 등장/만료 시각, 잡은 사람 `claimedBy`, 획득 점수 `points`를 가집니다.
+
+인증된 참가자는 `POST /api/games/whack-a-mole/rooms/{code}/hits`에 `{ "hole": 0, "moleId": 1, "gameNumber": 1 }`를 보냅니다. 구멍 번호는 0~15이고 빈 구멍은 `moleId: null`입니다. 참가 토큰은 기존과 같이 Authorization Bearer 헤더로 전달합니다. 점수·콤보·시간은 클라이언트에서 받지 않고 서버가 결정합니다. 다른 구멍을 동시에 누른 요청을 막지 않도록 방 revision 대신 두더지 ID와 게임 번호를 검증합니다.
 
 서버 타이머가 변경된 상태를 기존 소켓으로 전달하므로 게임 상태 폴링은 필요하지 않습니다. 재대결·퇴장은 기존 방 API를 사용합니다. 서버 재시작 시 방이 사라지는 기존 단일 서버 메모리 구조를 따릅니다.
 

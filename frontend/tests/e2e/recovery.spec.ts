@@ -19,7 +19,7 @@ test('refresh during a socket outage shows the saved board and restores the same
     await expect(guest.getByText(/복귀 대기 \d+분 \d+초/)).toBeVisible()
     // 저장소의 버전 값이 손상돼도 재인증 후에는 서버 보드가 최종 기준이 되어야 합니다.
     await host.evaluate(roomCode => {
-      const key = `nolja:recovery:${roomCode}`
+      const key = `nolja:recovery:othello:${roomCode}`
       const saved = JSON.parse(sessionStorage.getItem(key)!)
       saved.room.revision = 999999
       sessionStorage.setItem(key, JSON.stringify(saved))
@@ -92,15 +92,15 @@ test('a saved board cannot grant access with an invalid participant token', asyn
     await enterGame(host, guest)
     const code = new URL(host.url()).pathname.split('/').at(-1)!
     await host.evaluate(roomCode => {
-      const key = `nolja:room:${roomCode}`
+      const key = `nolja:room:othello:${roomCode}`
       const session = JSON.parse(sessionStorage.getItem(key)!)
       sessionStorage.setItem(key, JSON.stringify({ ...session, token: 'invalid-token' }))
     }, code)
     await host.reload()
     await expect(host.getByRole('heading', { name: '이 방에 참여할 수 없어요' })).toBeVisible()
     await expect(host.getByRole('grid')).toHaveCount(0)
-    expect(await host.evaluate(roomCode => sessionStorage.getItem(`nolja:room:${roomCode}`), code)).toBeNull()
-    expect(await host.evaluate(roomCode => sessionStorage.getItem(`nolja:recovery:${roomCode}`), code)).toBeNull()
+    expect(await host.evaluate(roomCode => sessionStorage.getItem(`nolja:room:othello:${roomCode}`), code)).toBeNull()
+    expect(await host.evaluate(roomCode => sessionStorage.getItem(`nolja:recovery:othello:${roomCode}`), code)).toBeNull()
     await host.getByRole('button', { name: '로비로 돌아가기', exact: true }).click()
     await expect(host.getByRole('button', { name: '이전 방으로 돌아가기', exact: true })).toHaveCount(0)
   } finally { await Promise.all([hostContext.close(), guestContext.close()]) }

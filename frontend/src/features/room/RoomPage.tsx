@@ -12,30 +12,32 @@ import { useReturnToLobby } from './lobby/useReturnToLobby'
 import { RematchPanel } from './rematch/RematchPanel'
 import { RecoveryNotice } from './recovery/RecoveryNotice'
 import { allPlayersConnected } from './recovery/recoveryState'
-import type { Admission, RoomSession } from './types'
+import type { Admission, GameType, RoomSession } from './types'
+import { admissionSession } from './model/gameType'
 import styles from './RoomPage.module.scss'
 import { MoleGame } from '../mole/MoleGame'
 
 // 방 코드와 기존 참가 정보를 받아, 입장 전/후 화면을 결정하는 페이지의 입력값입니다.
 interface RoomPageProps {
+  gameType: GameType
   code: string
   initialSession?: RoomSession
   onHome: () => void
 }
 
 // 참가 정보가 없으면 닉네임 폼, 있으면 인증이 필요한 방 화면을 보여줍니다.
-export function RoomPage({ code, initialSession, onHome }: RoomPageProps) {
+export function RoomPage({ code, gameType, initialSession, onHome }: RoomPageProps) {
   // 초기화 함수로 읽으므로 매 렌더마다 저장소에 접근하지 않습니다.
-  const [session, setSession] = useState<RoomSession | null>(() => initialSession ?? readSession(code))
+  const [session, setSession] = useState<RoomSession | null>(() => initialSession ?? readSession(code, gameType))
 
   // 링크 입장 성공 후 조회/착수 요청에 사용할 참가 ID와 토큰을 보관합니다.
   function admitted(admission: Admission) {
-    const next = { playerId: admission.playerId, token: admission.token }
+    const next = admissionSession(admission)
     saveSession(code, next)
     setSession(next)
   }
 
-  if (!session) return <RoomEntry code={code} onAdmitted={admitted} />
+  if (!session) return <RoomEntry code={code} gameType={gameType} onAdmitted={admitted} />
   return <ConnectedRoom code={code} session={session} onHome={onHome} />
 }
 
@@ -53,7 +55,7 @@ function ConnectedRoom({ code, session, onHome }: { code: string; session: RoomS
   const bothConnected = !!room && allPlayersConnected(room)
   // 화면에서도 입력을 제한하지만 최종 권한과 차례 검사는 서버가 다시 수행합니다.
   // 연결 오류나 다른 요청 처리 중에는 오래된 보드에 착수하지 못하게 합니다.
-  const canPlay = !!room && room.gameType !== 'whack-a-mole' && room.status === 'playing' && room.game.currentTurn === me?.color
+  const canPlay = !!room && room.gameType === 'othello' && room.status === 'playing' && room.game?.currentTurn === me?.color
     && connection.status === 'connected' && bothConnected && !terminal && !move.isPending && !lobby.pending
   const activityLabel = room?.status === 'closed' ? '게임 종료'
     : connection.status !== 'connected' ? '연결 복구 중' : !bothConnected ? '게임 일시정지' : undefined
@@ -88,7 +90,7 @@ function ConnectedRoom({ code, session, onHome }: { code: string; session: RoomS
           : room.gameType === 'whack-a-mole'
           ? room.mole && <MoleGame key={room.gameNumber} room={room} session={session} connected={connection.status === 'connected' && !terminal}
               bothConnected={bothConnected} serverOffset={connection.serverOffset} leaving={lobby.pending} onLeave={() => void lobby.returnToLobby()} />
-          : <OthelloGame game={room.game} players={room.players} me={me} canPlay={canPlay} gameNumber={room.gameNumber}
+          : room.game && <OthelloGame game={room.game} players={room.players} me={me} canPlay={canPlay} gameNumber={room.gameNumber}
               roomClosed={room.status === 'closed'} activityLabel={activityLabel}
               onPlay={position => void placeDisc(position)} onLeave={() => void lobby.returnToLobby()} leaving={lobby.pending}
               finishedActions={<RematchPanel key={room.gameNumber} room={room} session={session} connected={connection.status === 'connected'}

@@ -28,7 +28,7 @@ interface RecoveryNoticeProps {
 export function RecoveryNotice({ room, status, serverOffset, onLobby }: RecoveryNoticeProps) {
   if (room.status === 'closed') return <section className={styles.notice} aria-label="방 종료 안내">
     <p role="alert">{closedRoomMessage(room.closeReason)}</p>
-    {!(room.gameType === 'whack-a-mole' ? room.mole?.finished : room.game.status === 'finished') && <>
+    {!(room.gameType === 'whack-a-mole' ? room.mole?.finished : room.game?.status === 'finished') && <>
       <p className={styles.help}>마지막 보드를 보관했어요. 이 게임의 승패는 기록하지 않습니다.</p>
       <button type="button" onClick={onLobby}>로비로 돌아가기</button>
     </>}

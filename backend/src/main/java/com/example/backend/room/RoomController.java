@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 // HTTP 경로/본문/헤더를 Java 값으로 받아 서비스에 전달합니다.
 // 반환한 record는 Spring이 JSON으로 변환합니다. 규칙 판단은 서비스에 모읍니다.
 @RestController
-@RequestMapping("/api/rooms")
+@RequestMapping({"/api/rooms", "/api/games/{gameType}/rooms"})
 public class RoomController {
     private final RoomService rooms;
     // 생성자 주입: Spring이 관리하는 RoomService를 받아 모든 요청에서 같은 저장소를 사용합니다.
@@ -18,10 +18,21 @@ public class RoomController {
     @ModelAttribute
     public void preventCaching(HttpServletResponse response) { response.setHeader("Cache-Control", "no-store"); }
 
+    // 새 클라이언트의 게임별 경로는 해당 종류의 방만 조회/변경할 수 있습니다.
+    @ModelAttribute
+    public void checkGame(@PathVariable(required = false) String gameType, @PathVariable(required = false) String code) {
+        if (gameType != null) rooms.requireGameType(code, gameType);
+    }
+
     // JSON 본문의 nickname으로 방을 만들고, 새 리소스를 생성했다는 201 상태를 반환합니다.
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Admission create(@RequestBody CreateRequest request) { return rooms.create(request.nickname(), request.gameType()); }
+    public Admission create(@RequestBody CreateRequest request, @PathVariable(required = false) String gameType) {
+        if (gameType != null && request.gameType() != null && !gameType.equals(request.gameType())) {
+            throw new RoomException(HttpStatus.BAD_REQUEST, "GAME_TYPE_MISMATCH", "선택한 게임과 방의 게임 종류가 다릅니다.");
+        }
+        return rooms.create(request.nickname(), gameType == null ? request.gameType() : gameType);
+    }
 
     // PathVariable은 URL의 {code} 부분을 메서드 인자로 연결합니다. 입장 전 공개 조회입니다.
     @GetMapping("/{code}")

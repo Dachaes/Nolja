@@ -17,7 +17,10 @@ export async function enterGame(host: Page, guest: Page) {
 
 // 참가 토큰은 테스트 로그에 출력하지 않고 해당 기기의 정상 요청에만 사용합니다.
 export async function sessionOf(page: Page, code: string): Promise<RoomSession> {
-  return page.evaluate(roomCode => JSON.parse(sessionStorage.getItem(`nolja:room:${roomCode}`)!), code)
+  return page.evaluate(roomCode => {
+    const gameType = location.pathname.split('/')[2]
+    return JSON.parse(sessionStorage.getItem(`nolja:room:${gameType}:${roomCode}`)!)
+  }, code)
 }
 
 // 종료 준비에 수십 번의 클릭을 반복하지 않도록 실제 착수 API를 사용합니다.

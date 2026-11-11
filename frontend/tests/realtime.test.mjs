@@ -5,7 +5,7 @@ import { keepNewestRoom } from '../src/features/room/model/roomCache.ts'
 import { decodeRoomMessage, roomSocketUrl } from '../src/features/room/realtime/protocol.ts'
 
 const room = {
-  code: 'ABCDEF', status: 'playing', revision: 1, expiresAt: '2026-12-01T00:00:00Z', gameNumber: 1, rematchReadyPlayerIds: [],
+  gameType: 'othello', code: 'ABCDEF', status: 'playing', revision: 1, expiresAt: '2026-12-01T00:00:00Z', gameNumber: 1, rematchReadyPlayerIds: [],
   presence: [{ playerId: 'one', connected: true, reconnectDeadline: null }], closeReason: null, serverTime: '2026-11-10T00:00:00Z',
   players: [{ playerId: 'one', nickname: '민서', color: 'black', userId: null }], game: createInitialGame(),
 }
@@ -33,6 +33,7 @@ test('malformed frames cannot become the rendered board', () => {
   for (const raw of ['broken', 'null', '{}', '{"type":"unknown"}', JSON.stringify({ type: 'room', room: { ...room, revision: -1 } }),
     JSON.stringify({ type: 'room', room: { ...room, game: { ...room.game, board: [] } } }),
     JSON.stringify({ type: 'room', room: { ...room, gameNumber: 0 } }),
+    JSON.stringify({ type: 'room', room: { ...room, gameType: undefined } }),
     JSON.stringify({ type: 'room', room: { ...room, rematchReadyPlayerIds: ['outsider'] } }),
     JSON.stringify({ type: 'room', room: { ...room, rematchReadyPlayerIds: ['one', 'one'] } })]) {
     assert.equal(decodeRoomMessage(raw), null)
@@ -40,6 +41,6 @@ test('malformed frames cannot become the rendered board', () => {
 })
 
 test('socket URLs follow page encryption and contain no participant token', () => {
-  assert.equal(roomSocketUrl('http://192.168.0.10:5173', 'ABCDEF'), 'ws://192.168.0.10:5173/ws/rooms/ABCDEF')
-  assert.equal(roomSocketUrl('https://nolja.example', 'ABCDEF'), 'wss://nolja.example/ws/rooms/ABCDEF')
+  assert.equal(roomSocketUrl('http://192.168.0.10:5173', 'ABCDEF', 'othello'), 'ws://192.168.0.10:5173/ws/games/othello/rooms/ABCDEF')
+  assert.equal(roomSocketUrl('https://nolja.example', 'ABCDEF', 'whack-a-mole'), 'wss://nolja.example/ws/games/whack-a-mole/rooms/ABCDEF')
 })

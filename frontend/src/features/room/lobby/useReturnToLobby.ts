@@ -13,8 +13,8 @@ export function useReturnToLobby(code: string, session: RoomSession, room: Room 
 
   // 이미 종료되었거나 참가 권한이 없는 방에서는 서버 요청 없이 로컬 정보만 정리할 수 있습니다.
   function goToLobby() {
-    clearSession(code)
-    client.removeQueries({ queryKey: roomQueryKey(code, session.playerId), exact: true })
+    clearSession(code, session.gameType)
+    client.removeQueries({ queryKey: roomQueryKey(code, session.playerId, session.gameType), exact: true })
     onHome()
   }
 

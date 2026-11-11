@@ -10,12 +10,12 @@ import styles from './RoomEntry.module.scss'
 import { ResumeRoom } from '../recovery/ResumeRoom'
 
 // code가 없으면 방 생성, 있으면 초대받은 방 입장 화면으로 동작합니다.
-export function RoomEntry({ code, gameType = 'othello', onAdmitted }: { code?: string; gameType?: GameType; onAdmitted: (admission: Admission) => void }) {
+export function RoomEntry({ code, gameType, onAdmitted }: { code?: string; gameType: GameType; onAdmitted: (admission: Admission) => void }) {
   // 아직 토큰이 없으므로 공개 정보만 조회합니다. 대기 중 다른 사람이 먼저 입장할 수도 있어
   // 3초마다 갱신하며, code가 없는 생성 화면에서는 enabled=false로 조회를 생략합니다.
   const preview = useQuery({
-    queryKey: ['room-preview', code],
-    queryFn: ({ signal }) => roomApi.preview(code!, signal),
+    queryKey: ['room-preview', gameType, code],
+    queryFn: ({ signal }) => roomApi.preview(code!, gameType, signal),
     enabled: !!code,
     retry: false,
     refetchInterval: query => isTerminalError(query.state.error) ? false : 3000,
@@ -23,12 +23,12 @@ export function RoomEntry({ code, gameType = 'othello', onAdmitted }: { code?: s
   // 조회가 끝나기 전이나 오류/정원 초과 상태에서는 입장 폼을 보여주지 않습니다.
   const full = preview.data && preview.data.status !== 'waiting'
   const ready = !code || (preview.data && !preview.isError && !full)
-  const mole = (code ? preview.data?.gameType : gameType) === 'whack-a-mole'
+  const mole = gameType === 'whack-a-mole'
   const name = mole ? '두더지잡기' : '오셀로'
 
   // API의 성공 응답은 부모에게 넘깁니다. 예외는 NicknameForm이 받아 입력 오류로 표시합니다.
   async function enter(nickname: string) {
-    onAdmitted(code ? await roomApi.join(code, nickname) : await roomApi.create(nickname, gameType))
+    onAdmitted(code ? await roomApi.join(code, nickname, gameType) : await roomApi.create(nickname, gameType))
   }
 
   return (
@@ -51,7 +51,7 @@ export function RoomEntry({ code, gameType = 'othello', onAdmitted }: { code?: s
           {!isTerminalError(preview.error) && <button type="button" onClick={() => void preview.refetch()}>다시 확인</button>}
         </div>}
         {full && !preview.isError && <p className={styles.message} role="alert">이미 두 사람이 참여한 방입니다.</p>}
-        {!code && <ResumeRoom />}
+        {!code && <ResumeRoom gameType={gameType} />}
         {/* 방 상태 확인 후 바로 닉네임 폼을 표시합니다. 참가 인증은 입장 시 발급되는 토큰으로 처리합니다. */}
         {ready && <NicknameForm submitLabel={code ? '방 입장하기' : '방 만들기'} onSubmit={enter} />}
         <button type="button" className={styles.back} onClick={() => navigate('/')}>로비로 돌아가기</button>

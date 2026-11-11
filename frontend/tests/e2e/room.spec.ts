@@ -102,7 +102,7 @@ test('a disconnected player cannot move and reconnects to the latest board witho
   host.on('request', request => { if (request.url().endsWith('/state')) stateRequests.push(request.url()) })
 
   // 평소에는 실제 서버로 그대로 전달하고, 장애 구간에만 연결을 종료합니다.
-  await host.routeWebSocket('**/ws/rooms/*', async socket => {
+  await host.routeWebSocket('**/ws/games/*/rooms/*', async socket => {
     if (blocked) { await socket.close({ code: 4000 }); return }
     const server = socket.connectToServer()
     disconnect = async () => { await Promise.all([socket.close({ code: 4000 }), server.close()]) }

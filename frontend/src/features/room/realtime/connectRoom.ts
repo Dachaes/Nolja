@@ -57,7 +57,7 @@ export function connectRoom({ code, session, onRoom, onStatus, onError }: RoomCo
     if (!navigator.onLine) { setStatus('offline'); return }
     stopSocket()
     const currentGeneration = generation
-    const current = new WebSocket(roomSocketUrl(backendOrigin || window.location.origin, code))
+    const current = new WebSocket(roomSocketUrl(backendOrigin || window.location.origin, code, session.gameType))
     socket = current
     const active = () => !disposed && !suspended && currentGeneration === generation
 
@@ -86,6 +86,13 @@ export function connectRoom({ code, session, onRoom, onStatus, onError }: RoomCo
         return
       }
       lastReceived = Date.now()
+      if (message.type === 'room' && message.room.gameType !== session.gameType) {
+        terminal = true
+        stopSocket()
+        onError(new RoomApiError('선택한 게임과 다른 방에 연결할 수 없습니다.', 'GAME_TYPE_MISMATCH', 409))
+        setStatus('closed')
+        return
+      }
       if (message.type === 'pong') return
       if (message.type === 'error') {
         const error = new RoomApiError(message.error.message, message.error.code, message.status)

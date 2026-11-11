@@ -10,7 +10,7 @@ import { readRoomSnapshot } from '../recovery/recoveryStorage'
 // 연결 수명과 업무 요청을 조합합니다. 착수는 HTTP로 검증하고, 상대 변화는 WebSocket으로 받습니다.
 export function useRoom(code: string, session: RoomSession) {
   const client = useQueryClient()
-  const queryKey = roomQueryKey(code, session.playerId)
+  const queryKey = roomQueryKey(code, session.playerId, session.gameType)
   const connection = useRoomConnection(code, session)
   // 저장된 보드는 화면 표시용으로만 보관합니다. 서버 상태 캐시에 섞으면 손상된 버전 때문에 복구가 막힐 수 있습니다.
   const [recoveredRoom] = useState(() => readRoomSnapshot(code, session))

@@ -49,8 +49,10 @@ public class RoomSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession socket, TextMessage message) {
         RoomSocketConnection connection = connections.get(socket.getId());
         if (connection == null) return;
-        String code = socket.getUri().getPath().substring("/ws/rooms/".length());
+        String[] path = socket.getUri().getPath().split("/");
+        String code = path[path.length - 1];
         try {
+            if (path.length == 6 && "games".equals(path[2])) rooms.requireGameType(code, path[3]);
             var body = json.readTree(message.getPayload());
             String type = body.path("type").asString("");
             if (connection.token() == null) {
