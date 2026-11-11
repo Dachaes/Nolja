@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.example.backend.othello.GameState;
+import com.example.backend.mole.MoleMatch;
 import com.example.backend.othello.OthelloRules;
 import com.example.backend.room.RoomDtos.*;
 import com.example.backend.room.realtime.RoomUpdates;
@@ -55,6 +56,12 @@ public class RoomService {
 
     // 닉네임 검증 → 만료 방 정리 → 고유 코드 발급 → 흑 참가자 등록 순으로 방을 생성합니다.
     public synchronized Admission create(String nickname) {
+        return create(nickname, "othello");
+    }
+
+    public synchronized Admission create(String nickname, String gameType) {
+        String type = gameType == null ? "othello" : gameType;
+        if (!List.of("othello", "whack-a-mole").contains(type)) throw error(HttpStatus.BAD_REQUEST, "INVALID_GAME", "지원하지 않는 게임입니다.");
         String name = validateNickname(nickname);
         // 생성 시 만료 데이터를 정리하고 최대 개수를 제한해 메모리가 계속 늘지 않도록 합니다.
         expireDisconnectedRooms();
@@ -62,7 +69,7 @@ public class RoomService {
         String code;
         // 난수라도 중복 가능성이 있으므로 실제 저장소에서 사용 중인지 확인합니다.
         do { code = generateCode(); } while (rooms.containsKey(code));
-        Room room = new Room(code, clock.instant().plus(LIFETIME));
+        Room room = new Room(code, clock.instant().plus(LIFETIME), type);
         Member host = member(name, "black");
         room.members.add(host);
         room.presence.admit(host.player.playerId(), clock.instant(), recovery.gracePeriod());
@@ -73,7 +80,7 @@ public class RoomService {
     // 초대받은 사람은 아직 토큰이 없으므로 방장 이름/정원 등 공개 정보만 제공합니다.
     public synchronized Preview preview(String code) {
         Room room = find(code);
-        return new Preview(room.code, room.status, room.members.getFirst().player.nickname(), room.members.size(), room.expiresAt);
+        return new Preview(room.code, room.status, room.members.getFirst().player.nickname(), room.members.size(), room.expiresAt, room.gameType);
     }
 
     // 두 번째 참가자를 백으로 등록합니다. 정원 검사와 등록이 같은 잠금 안에서 실행됩니다.
@@ -90,6 +97,7 @@ public class RoomService {
         room.presence.admit(guest.player.playerId(), clock.instant(), recovery.gracePeriod());
         // 두 명이 모였으므로 게임을 시작합니다. revision 증가를 통해 클라이언트도 변경을 구분합니다.
         room.status = "playing";
+        if ("whack-a-mole".equals(room.gameType)) room.mole = new MoleMatch(room.members.stream().map(value -> value.player.playerId()).toList(), random);
         room.revision++;
         updates.publish(view(room));
         return new Admission(view(room), guest.player.playerId(), guest.token);
@@ -113,6 +121,7 @@ public class RoomService {
         String connectionId = UUID.randomUUID().toString();
         Runnable unsubscribe = updates.subscribe(code, listener);
         if (room.presence.connect(playerId, connectionId)) {
+            advanceMoles(room);
             room.revision++;
             updates.publish(view(room));
         } else listener.accept(view(room));
@@ -124,6 +133,7 @@ public class RoomService {
         unsubscribe.run();
         if (rooms.get(room.code) != room || "closed".equals(room.status)) return;
         if (room.presence.disconnect(playerId, connectionId, clock.instant(), recovery.gracePeriod())) {
+            advanceMoles(room);
             room.revision++;
             updates.publish(view(room));
         }
@@ -133,6 +143,7 @@ public class RoomService {
     public synchronized RoomView move(String code, String token, MoveRequest request) {
         Room room = find(code);
         Member member = authenticate(room, token);
+        if (!"othello".equals(room.gameType)) throw error(HttpStatus.CONFLICT, "WRONG_GAME", "오셀로 방에서만 돌을 둘 수 있습니다.");
         if (!"playing".equals(room.status)) throw error(HttpStatus.CONFLICT, "NOT_PLAYING", "두 사람이 입장한 진행 중인 방에서만 돌을 둘 수 있습니다.");
         requireConnected(room);
         if (request == null || request.revision() == null || request.row() == null || request.col() == null) {
@@ -152,6 +163,22 @@ public class RoomService {
         room.revision++;
         // 패스와 종료도 새 보드에 포함되므로 같은 상태 메시지 하나로 두 화면을 동기화합니다.
         updates.publish(view(room));
+        return view(room);
+    }
+
+    public synchronized RoomView hit(String code, String token, HitRequest request) {
+        Room room = find(code);
+        Member member = authenticate(room, token);
+        if (!"whack-a-mole".equals(room.gameType)) throw error(HttpStatus.CONFLICT, "WRONG_GAME", "두더지잡기 방이 아닙니다.");
+        if (request == null || request.hole() == null || request.hole() < 0 || request.hole() >= 16
+                || request.gameNumber() == null || (request.moleId() != null && request.moleId() < 1)) {
+            throw error(HttpStatus.BAD_REQUEST, "INVALID_HIT", "구멍 위치와 게임 번호를 확인해 주세요.");
+        }
+        if (request.gameNumber() != room.gameNumber) throw error(HttpStatus.CONFLICT, "STALE_GAME", "이미 다음 게임으로 바뀌었습니다.");
+        requireConnected(room);
+        boolean changed = advanceMoles(room);
+        if ("playing".equals(room.status)) changed |= room.mole.hit(member.player.playerId(), request.hole(), request.moleId(), clock.instant());
+        if (changed) { room.revision++; updates.publish(view(room)); }
         return view(room);
     }
 
@@ -183,13 +210,17 @@ public class RoomService {
     // 참가 ID·닉네임·토큰은 유지하고 돌 색상과 게임 상태만 초기화합니다.
     // 방 전체 revision은 초기화하지 않아 이전 판의 지연 응답이 새 보드를 덮어쓰지 못하게 합니다.
     private void startNextGame(Room room) {
-        room.members.replaceAll(member -> {
+        if ("othello".equals(room.gameType)) room.members.replaceAll(member -> {
             Player player = member.player;
             String nextColor = "black".equals(player.color()) ? "white" : "black";
             return new Member(new Player(player.playerId(), player.nickname(), player.userId(), nextColor), member.token);
         });
         room.game = OthelloRules.initial();
         room.status = "playing";
+        if ("whack-a-mole".equals(room.gameType)) {
+            room.mole = new MoleMatch(room.members.stream().map(value -> value.player.playerId()).toList(), random);
+            advanceMoles(room);
+        }
         room.gameNumber++;
         room.rematch.clear();
     }
@@ -236,6 +267,20 @@ public class RoomService {
 
     private void requireConnected(Room room) {
         if (!room.presence.allConnected()) throw error(HttpStatus.CONFLICT, "PLAYER_DISCONNECTED", "참가자가 다시 연결될 때까지 게임을 잠시 멈췄어요.");
+    }
+
+    private boolean advanceMoles(Room room) {
+        if (room.mole == null || !"playing".equals(room.status)) return false;
+        boolean changed = room.mole.tick(clock.instant(), room.presence.allConnected());
+        if (room.mole.finished()) room.status = "finished";
+        return changed;
+    }
+
+    // 두더지/점수에 변화가 있을 때만 알립니다. 브라우저의 시계는 서버 시각을 기준으로 표시합니다.
+    public synchronized void tickMoleRooms() {
+        for (Room room : rooms.values()) {
+            if (advanceMoles(room)) { room.revision++; updates.publish(view(room)); }
+        }
     }
 
     // 서버가 시간을 결정합니다. 브라우저의 카운트다운은 안내용이며 종료 여부를 결정하지 않습니다.
@@ -289,7 +334,7 @@ public class RoomService {
     private RoomView view(Room room) {
         return new RoomView(room.code, room.status, room.members.stream().map(member -> member.player).toList(),
                 OthelloRules.copy(room.game), room.revision, room.expiresAt, room.gameNumber, room.rematch.snapshot(),
-                room.presence.snapshot(), room.closeReason, clock.instant());
+                room.presence.snapshot(), room.closeReason, clock.instant(), room.gameType, room.mole == null ? null : room.mole.snapshot());
     }
 
     // 예외 생성 형식을 통일합니다. HTTP 응답으로 변환하는 일은 RoomErrorHandler가 담당합니다.
@@ -301,6 +346,8 @@ public class RoomService {
     private static final class Room {
         final String code;
         final Instant expiresAt;
+        final String gameType;
+        MoleMatch mole;
         final List<Member> members = new ArrayList<>();
         String status = "waiting";
         // 대기 중에도 초기 보드는 준비해 두지만, move는 방 상태가 playing일 때만 허용합니다.
@@ -311,7 +358,7 @@ public class RoomService {
         final RoomPresence presence = new RoomPresence();
         String closeReason;
 
-        Room(String code, Instant expiresAt) { this.code = code; this.expiresAt = expiresAt; }
+        Room(String code, Instant expiresAt, String gameType) { this.code = code; this.expiresAt = expiresAt; this.gameType = gameType; }
     }
 
 }

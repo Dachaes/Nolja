@@ -21,7 +21,7 @@ public class RoomController {
     // JSON 본문의 nickname으로 방을 만들고, 새 리소스를 생성했다는 201 상태를 반환합니다.
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Admission create(@RequestBody NicknameRequest request) { return rooms.create(request.nickname()); }
+    public Admission create(@RequestBody CreateRequest request) { return rooms.create(request.nickname(), request.gameType()); }
 
     // PathVariable은 URL의 {code} 부분을 메서드 인자로 연결합니다. 입장 전 공개 조회입니다.
     @GetMapping("/{code}")
@@ -43,6 +43,13 @@ public class RoomController {
     public RoomView move(@PathVariable String code, @RequestHeader(value = "Authorization", required = false) String authorization,
                          @RequestBody MoveRequest request) {
         return rooms.move(code, bearer(authorization), request);
+    }
+
+    // 두더지 ID를 검증해 먼저 잡은 참가자에게만 점수를 줍니다.
+    @PostMapping("/{code}/hits")
+    public RoomView hit(@PathVariable String code, @RequestHeader(value = "Authorization", required = false) String authorization,
+                        @RequestBody HitRequest request) {
+        return rooms.hit(code, bearer(authorization), request);
     }
 
     // 본인의 재대결 동의를 설정/취소합니다. 클라이언트가 다른 참가자의 ID를 지정할 수 없습니다.
