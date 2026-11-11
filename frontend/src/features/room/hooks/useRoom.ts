@@ -31,7 +31,7 @@ export function useRoom(code: string, session: RoomSession) {
     onSuccess: room => {
       receiveRoom(client, session, room)
     },
-    // 응답 유실/오래된 버전 같은 실패 때만 일회성 재조회합니다. 정상 대국에서는 폴링하지 않습니다.
+    // 응답 유실/오래된 버전 같은 실패 때만 일회성 재조회합니다. 정상 게임에서는 폴링하지 않습니다.
     onError: () => { void query.refetch() },
     retry: false,
   })

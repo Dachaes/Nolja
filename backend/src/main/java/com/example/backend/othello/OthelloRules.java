@@ -64,7 +64,7 @@ public final class OthelloRules {
 
     // 기존 상태를 보존하면서 한 수를 적용한 새 상태를 만듭니다. 잘못된 수는 예외로 알립니다.
     public static GameState play(GameState game, int row, int col) {
-        if (!"playing".equals(game.status())) throw new IllegalArgumentException("이미 끝난 대국입니다.");
+        if (!"playing".equals(game.status())) throw new IllegalArgumentException("이미 끝난 게임입니다.");
         String color = game.currentTurn();
         List<Position> captured = flips(game.board(), color, row, col);
         if (captured.isEmpty()) throw new IllegalArgumentException("돌을 놓을 수 없는 위치입니다.");

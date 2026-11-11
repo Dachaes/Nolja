@@ -21,7 +21,7 @@ export function useReturnToLobby(code: string, session: RoomSession, room: Room 
   async function returnToLobby() {
     if (submitting.current) return
     if (room?.status === 'closed') { goToLobby(); return }
-    if (room?.status === 'playing' && !window.confirm('방을 나가면 두 사람의 대국이 종료됩니다. 나갈까요?')) return
+    if (room?.status === 'playing' && !window.confirm('방을 나가면 두 사람의 게임이 종료됩니다. 나갈까요?')) return
     submitting.current = true
     try {
       await leave.mutateAsync()

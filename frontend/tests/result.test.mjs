@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { getGameResult } from '../src/features/othello/result/result.ts'
 
-// 보드가 다 차지 않고 끝난 대국도 실제 돌 수만 점수로 계산해야 합니다.
+// 보드가 다 차지 않고 끝난 게임도 실제 돌 수만 점수로 계산해야 합니다.
 test('the same final board gives opposite outcomes to the two players', () => {
   const board = Array.from({ length: 8 }, () => Array(8).fill(null))
   board[0] = ['black', 'black', 'black', 'white', null, null, null, null]

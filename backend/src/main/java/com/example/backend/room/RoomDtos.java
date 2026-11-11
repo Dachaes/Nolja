@@ -14,7 +14,7 @@ public final class RoomDtos {
     public record NicknameRequest(String nickname) {}
     // Integer는 누락된 필드를 null로 구분할 수 있습니다. int로 받으면 기본값 0과 구분하기 어렵습니다.
     public record MoveRequest(Integer row, Integer col, Integer revision) {}
-    // 대국 번호로 지난 판에서 늦게 도착한 재대결 요청을 구분합니다. ready=false는 본인의 동의 취소입니다.
+    // 게임 번호로 지난 판에서 늦게 도착한 재대결 요청을 구분합니다. ready=false는 본인의 동의 취소입니다.
     public record RematchRequest(Integer gameNumber, Boolean ready) {}
     // 외부에 보여도 되는 참가자 정보입니다. 인증 토큰은 포함하지 않습니다.
     public record Player(String playerId, String nickname, String userId, String color) {}

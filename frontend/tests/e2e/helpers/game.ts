@@ -47,7 +47,7 @@ export async function finishGame(host: Page, guest: Page, seed = 42): Promise<Ro
     expect(response.ok()).toBe(true)
     room = await response.json()
   }
-  await expect(host.getByRole('region', { name: '대국 결과' })).toBeVisible()
-  await expect(guest.getByRole('region', { name: '대국 결과' })).toBeVisible()
+  await expect(host.getByRole('region', { name: '게임 결과' })).toBeVisible()
+  await expect(guest.getByRole('region', { name: '게임 결과' })).toBeVisible()
   return room
 }

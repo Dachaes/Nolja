@@ -9,7 +9,7 @@ import { COLOR_LABEL, getLegalMoves, getScore, getWinner } from './rules'
 import type { GameState, Player, Position } from './types'
 import styles from './OthelloGame.module.scss'
 
-// 대국 상태와 내 참가 정보는 부모가 서버에서 받아 전달합니다.
+// 게임 상태와 내 참가 정보는 부모가 서버에서 받아 전달합니다.
 // 이 컴포넌트는 화면 구성과 힌트 표시만 맡으며 API를 직접 호출하지 않습니다.
 interface OthelloGameProps {
   game: GameState
@@ -38,7 +38,7 @@ export function OthelloGame({ game, players, me, canPlay, onPlay, onLeave, leavi
   // 화면의 차례/결과를 스크린리더도 전달받을 수 있도록 하나의 문장으로 만듭니다.
   const announcement = game.currentTurn
     ? `${passMessage} ${game.currentTurn === me.color ? '내 차례' : '상대 차례'}입니다.`
-    : `대국 종료. ${winner === 'draw' ? '무승부' : winner ? `${COLOR_LABEL[winner]} 승리` : ''}.`
+    : `게임 종료. ${winner === 'draw' ? '무승부' : winner ? `${COLOR_LABEL[winner]} 승리` : ''}.`
 
   return (
     <main className={styles.game} aria-label="오셀로 온라인 대전">

@@ -144,7 +144,7 @@ class RoomSocketTests {
             }
             assertEquals("finished", current.game().status());
             assertNull(current.game().currentTurn());
-            // 대국 종료 후에도 같은 소켓에서 동의·취소·다음 보드를 받아야 합니다.
+            // 게임 종료 후에도 같은 소켓에서 동의·취소·다음 보드를 받아야 합니다.
             RoomView requested = rooms.rematch(host.room().code(), host.token(), new RematchRequest(1, true));
             assertSnapshot(requested, black.next());
             assertSnapshot(requested, white.next());

@@ -88,7 +88,7 @@ public class RoomService {
         Member guest = member(name, "white");
         room.members.add(guest);
         room.presence.admit(guest.player.playerId(), clock.instant(), recovery.gracePeriod());
-        // 두 명이 모였으므로 대국을 시작합니다. revision 증가를 통해 클라이언트도 변경을 구분합니다.
+        // 두 명이 모였으므로 게임을 시작합니다. revision 증가를 통해 클라이언트도 변경을 구분합니다.
         room.status = "playing";
         room.revision++;
         updates.publish(view(room));
@@ -155,19 +155,19 @@ public class RoomService {
         return view(room);
     }
 
-    // 두 기기가 같은 대국 번호로 동시에 동의해도 잠금 안에서 순서대로 반영되므로 한 번만 시작합니다.
+    // 두 기기가 같은 게임 번호로 동시에 동의해도 잠금 안에서 순서대로 반영되므로 한 번만 시작합니다.
     // revision을 입력으로 받으면 첫 동의가 버전을 올려 두 번째 정상 동의까지 거절되므로 gameNumber를 씁니다.
     public synchronized RoomView rematch(String code, String token, RematchRequest request) {
         Room room = find(code);
         Member member = authenticate(room, token);
         if (request == null || request.gameNumber() == null || request.ready() == null || request.gameNumber() < 1) {
-            throw error(HttpStatus.BAD_REQUEST, "INVALID_REMATCH", "대국 번호와 재대결 동의 여부가 필요합니다.");
+            throw error(HttpStatus.BAD_REQUEST, "INVALID_REMATCH", "게임 번호와 재대결 동의 여부가 필요합니다.");
         }
         if (request.gameNumber() != room.gameNumber) {
-            throw error(HttpStatus.CONFLICT, "STALE_GAME", "이미 다음 대국으로 바뀌었습니다. 현재 화면을 확인해 주세요.");
+            throw error(HttpStatus.CONFLICT, "STALE_GAME", "이미 다음 게임으로 바뀌었습니다. 현재 화면을 확인해 주세요.");
         }
         if (!"finished".equals(room.status)) {
-            throw error(HttpStatus.CONFLICT, "GAME_NOT_FINISHED", "대국이 끝난 뒤 재대결을 요청할 수 있습니다.");
+            throw error(HttpStatus.CONFLICT, "GAME_NOT_FINISHED", "게임이 끝난 뒤 재대결을 요청할 수 있습니다.");
         }
         if (request.ready()) requireConnected(room);
         // 같은 상태를 반복 요청하면 버전을 올리거나 알림을 중복 전송하지 않습니다.
@@ -180,7 +180,7 @@ public class RoomService {
         return updated;
     }
 
-    // 참가 ID·닉네임·토큰은 유지하고 돌 색상과 대국 상태만 초기화합니다.
+    // 참가 ID·닉네임·토큰은 유지하고 돌 색상과 게임 상태만 초기화합니다.
     // 방 전체 revision은 초기화하지 않아 이전 판의 지연 응답이 새 보드를 덮어쓰지 못하게 합니다.
     private void startNextGame(Room room) {
         room.members.replaceAll(member -> {
@@ -235,7 +235,7 @@ public class RoomService {
     }
 
     private void requireConnected(Room room) {
-        if (!room.presence.allConnected()) throw error(HttpStatus.CONFLICT, "PLAYER_DISCONNECTED", "참가자가 다시 연결될 때까지 대국을 잠시 멈췄어요.");
+        if (!room.presence.allConnected()) throw error(HttpStatus.CONFLICT, "PLAYER_DISCONNECTED", "참가자가 다시 연결될 때까지 게임을 잠시 멈췄어요.");
     }
 
     // 서버가 시간을 결정합니다. 브라우저의 카운트다운은 안내용이며 종료 여부를 결정하지 않습니다.

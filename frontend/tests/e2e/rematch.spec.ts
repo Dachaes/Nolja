@@ -17,8 +17,8 @@ test('both devices see results, cancel and accept rematches, then return to the 
     const finished = await finishGame(host, guest)
     const score = getScore(finished.game.board)
     const winner = getWinner(finished.game.board)
-    const hostResult = host.getByRole('region', { name: '대국 결과' })
-    const guestResult = guest.getByRole('region', { name: '대국 결과' })
+    const hostResult = host.getByRole('region', { name: '게임 결과' })
+    const guestResult = guest.getByRole('region', { name: '게임 결과' })
     const title = (color: string) => winner === 'draw' ? '무승부예요' : winner === color ? '승리했어요!' : '아쉽게 패배했어요'
     await expect(hostResult.getByRole('heading')).toHaveText(title('black'))
     await expect(guestResult.getByRole('heading')).toHaveText(title('white'))
@@ -51,7 +51,7 @@ test('both devices see results, cancel and accept rematches, then return to the 
     await guest.getByRole('button', { name: 'D3, 놓을 수 있음', exact: true }).click()
     await expect(host.getByText('내 차례', { exact: true })).toBeVisible()
     await finishGame(host, guest)
-    await expect(hostResult.getByText('2번째 대국 결과', { exact: true })).toBeVisible()
+    await expect(hostResult.getByText('2번째 게임 결과', { exact: true })).toBeVisible()
 
     // 로비 복귀 요청이 실패하면 결과를 남겨 재시도할 수 있게 합니다.
     await host.route('**/api/rooms/*/players/me', route => route.fulfill({ status: 503,
@@ -72,7 +72,7 @@ test('both devices see results, cancel and accept rematches, then return to the 
     // 방이 닫힌 뒤 새로고침해도 기존 참가자는 서버에서 같은 결과를 다시 받을 수 있습니다.
     await guest.reload()
     await expect(guest.getByText('연결 종료', { exact: true })).toBeVisible()
-    await expect(guestResult.getByText('2번째 대국 결과', { exact: true })).toBeVisible()
+    await expect(guestResult.getByText('2번째 게임 결과', { exact: true })).toBeVisible()
     await guest.getByRole('button', { name: '로비로 돌아가기', exact: true }).click()
     await expect(guest.getByRole('heading', { name: '오늘은 무엇을 할까요?' })).toBeVisible()
     expect(await guest.evaluate(roomCode => sessionStorage.getItem(`nolja:room:${roomCode}`), code)).toBeNull()

@@ -12,12 +12,12 @@ test('two devices create, copy an invite, join, play only their turns, reload an
   const third = await thirdContext.newPage()
   // 겉으로 화면이 보여도 JavaScript 예외가 발생했을 수 있으므로 별도로 모아 마지막에 확인합니다.
   const errors: string[] = []
-  // 계정 API가 없어도 홈부터 대국까지 가능해야 합니다. 숨은 로그인 의존성이 다시 생기면 실패합니다.
+  // 계정 API가 없어도 홈부터 게임까지 가능해야 합니다. 숨은 로그인 의존성이 다시 생기면 실패합니다.
   const accountRequests: string[] = []
   for (const page of [host, guest]) page.on('request', request => {
     if (/\/api\/(auth|account|friends)(\/|$)/.test(request.url())) accountRequests.push(request.url())
   })
-  // 정상 대국에서 /state 요청 없이 WebSocket만으로 보드가 동기화되는지 확인합니다.
+  // 정상 게임에서 /state 요청 없이 WebSocket만으로 보드가 동기화되는지 확인합니다.
   const stateRequests: string[] = []
   host.on('request', request => { if (request.url().endsWith('/state')) stateRequests.push(request.url()) })
   guest.on('request', request => { if (request.url().endsWith('/state')) stateRequests.push(request.url()) })

@@ -18,8 +18,8 @@ export function GameResult({ board, players, me, gameNumber, actions }: GameResu
   const { score, winner, title } = getGameResult(board, me.color)
   const winningPlayer = players.find(player => player.color === winner)
   return (
-    <section className={styles.result} aria-label="대국 결과">
-      <p className={styles.eyebrow}>{gameNumber}번째 대국 결과</p>
+    <section className={styles.result} aria-label="게임 결과">
+      <p className={styles.eyebrow}>{gameNumber}번째 게임 결과</p>
       <h2>{title}</h2>
       <p className={styles.description}>{winner === 'draw' ? '두 사람의 돌 개수가 같아요.' : `${winningPlayer?.nickname ?? COLOR_LABEL[winner]}님의 승리예요.`}</p>
       {/* 순서를 흑/백으로 고정하고 실제 놓인 돌 개수를 보여줍니다. 빈칸은 점수에 더하지 않습니다. */}
@@ -33,7 +33,7 @@ export function GameResult({ board, players, me, gameNumber, actions }: GameResu
           </div>
         })}
       </div>
-      <p className={styles.description}>두 사람 모두 둘 곳이 없어 대국이 끝났어요.</p>
+      <p className={styles.description}>두 사람 모두 둘 곳이 없어 게임이 끝났어요.</p>
       {actions}
     </section>
   )

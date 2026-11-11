@@ -54,8 +54,8 @@ function ConnectedRoom({ code, session, onHome }: { code: string; session: RoomS
   // 연결 오류나 다른 요청 처리 중에는 오래된 보드에 착수하지 못하게 합니다.
   const canPlay = !!room && room.status === 'playing' && room.game.currentTurn === me?.color
     && connection.status === 'connected' && bothConnected && !terminal && !move.isPending && !lobby.pending
-  const activityLabel = room?.status === 'closed' ? '대국 종료'
-    : connection.status !== 'connected' ? '연결 복구 중' : !bothConnected ? '대국 일시정지' : undefined
+  const activityLabel = room?.status === 'closed' ? '게임 종료'
+    : connection.status !== 'connected' ? '연결 복구 중' : !bothConnected ? '게임 일시정지' : undefined
   // 이미 더 최신 상태로 복구했다면 이전 보드에서 발생한 착수 오류를 계속 표시하지 않습니다.
   const moveError = move.error && room?.revision === move.variables?.revision ? move.error : null
 

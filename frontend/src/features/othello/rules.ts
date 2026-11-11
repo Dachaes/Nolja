@@ -1,7 +1,7 @@
 import type { Board, Cell, DiscColor, GameState, Position } from './types.ts'
 
 // 화면의 착수 힌트·점수 계산과 규칙 테스트에 쓰는 순수 함수 모음입니다.
-// 온라인 대국의 최종 착수 검증은 백엔드 OthelloRules가 수행합니다.
+// 온라인 게임의 최종 착수 검증은 백엔드 OthelloRules가 수행합니다.
 export const BOARD_SIZE = 8
 export const COLOR_LABEL: Record<DiscColor, string> = { black: '흑', white: '백' }
 // [행 변화량, 열 변화량]: 현재 칸에서 가로·세로·대각선의 8방향을 탐색합니다.
@@ -66,7 +66,7 @@ export function getScore(board: Board) {
   return score
 }
 
-// 돌 수만 비교합니다. 대국 종료 여부는 호출하는 쪽에서 확인해야 합니다.
+// 돌 수만 비교합니다. 게임 종료 여부는 호출하는 쪽에서 확인해야 합니다.
 export function getWinner(board: Board): DiscColor | 'draw' {
   const score = getScore(board)
   return score.black === score.white ? 'draw' : score.black > score.white ? 'black' : 'white'
@@ -86,7 +86,7 @@ export function playMove(game: GameState, position: Position): GameState {
   for (const { row, col } of flips) board[row][col] = color
 
   const opponent = opponentOf(color)
-  // 상대가 둘 수 있으면 교대, 상대만 못 두면 자동 패스, 둘 다 못 두면 대국 종료입니다.
+  // 상대가 둘 수 있으면 교대, 상대만 못 두면 자동 패스, 둘 다 못 두면 게임 종료입니다.
   // 보드에 빈칸이 남아 있어도 양쪽 모두 둘 수 없다면 종료됩니다.
   const opponentCanPlay = getLegalMoves(board, opponent).length > 0
   const canContinue = opponentCanPlay || getLegalMoves(board, color).length > 0

@@ -1,4 +1,4 @@
-// 대기/대국/오류 화면이 공유하는 페이지 배경과 최소 높이입니다.
+// 대기/게임/오류 화면이 공유하는 페이지 배경과 최소 높이입니다.
 .page { min-height: 100svh; background: radial-gradient(ellipse at 50% 38%, var(--color-surface), var(--color-background) 75%); }
 // 초기 연결이나 복구 불가능한 오류처럼 보드가 없는 상태 화면을 가운데 배치합니다.
 .state { width: min(100% - 40px, 400px); margin: 72px auto; text-align: center; font-size: 14px; line-height: 1.8; }

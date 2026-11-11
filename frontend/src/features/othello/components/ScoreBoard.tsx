@@ -11,8 +11,8 @@ export function ScoreBoard({ score, currentTurn, myColor, activityLabel }: { sco
       <Disc color="black" small /><span>{score.black}</span><span className={styles.dash}>–</span><span>{score.white}</span><Disc color="white" small />
     </div>
     <span className={styles.divider} />
-    <span className={styles.turn} aria-label={activityLabel ?? (currentTurn ? `${COLOR_LABEL[currentTurn]} 차례` : '대국 종료')}>
-      {activityLabel ?? (currentTurn ? currentTurn === myColor ? '내 차례' : '상대 차례' : '대국 종료')}
+    <span className={styles.turn} aria-label={activityLabel ?? (currentTurn ? `${COLOR_LABEL[currentTurn]} 차례` : '게임 종료')}>
+      {activityLabel ?? (currentTurn ? currentTurn === myColor ? '내 차례' : '상대 차례' : '게임 종료')}
     </span>
   </div>
 }

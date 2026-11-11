@@ -57,7 +57,7 @@ test('network return reconnects automatically and lobby navigation can resume th
     await guestContext.setOffline(true)
     await expect(guest.getByText('인터넷 연결을 기다리고 있어요.', { exact: true })).toBeVisible()
     await expect(host.getByText('지훈님의 연결을 기다리고 있어요.', { exact: true })).toBeVisible()
-    await expect(host.getByText('대국 일시정지', { exact: true })).toBeVisible()
+    await expect(host.getByText('게임 일시정지', { exact: true })).toBeVisible()
     // 브라우저 버튼만 막은 것이 아니라 서버도 오프라인 중의 착수를 거절하는지 확인합니다.
     const origin = new URL(invite).origin
     const headers = { Authorization: `Bearer ${hostSession.token}` }

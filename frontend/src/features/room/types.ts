@@ -1,7 +1,7 @@
 import type { GameState, Player } from '../othello/types'
 import type { PlayerPresence, CloseReason } from './recovery/types'
 
-// 참가 대기 → 대국 진행 → 정상 종료, 또는 참가자 퇴장에 의한 방 폐쇄를 구분합니다.
+// 참가 대기 → 게임 진행 → 정상 종료, 또는 참가자 퇴장에 의한 방 폐쇄를 구분합니다.
 export type RoomStatus = 'waiting' | 'playing' | 'finished' | 'closed'
 
 // 초대받은 사람이 참가하기 전에도 볼 수 있는 최소 정보입니다. 토큰/보드는 포함하지 않습니다.

@@ -26,7 +26,7 @@ export function saveRoomSnapshot(room: Room, session: RoomSession) {
   if (!isRoomSnapshot(room) || !room.players.some(player => player.playerId === session.playerId)) return
   try {
     sessionStorage.setItem(key(room.code), JSON.stringify({ playerId: session.playerId, room, savedAt: Date.now() }))
-  } catch { /* 저장 공간 부족/저장소 차단 시에도 현재 연결된 대국은 계속할 수 있습니다. */ }
+  } catch { /* 저장 공간 부족/저장소 차단 시에도 현재 연결된 게임은 계속할 수 있습니다. */ }
 }
 
 export function clearRoomSnapshot(code: string) {

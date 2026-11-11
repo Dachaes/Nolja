@@ -89,7 +89,7 @@ class RoomServiceTests {
         String code = host.room().code();
         assertEquals("NOT_PLAYING", assertThrows(RoomException.class, () -> rooms.move(code, host.token(), new MoveRequest(2, 3, 0))).code());
         Admission guest = rooms.join(code, "guest");
-        // 실제 연결이 있어야 대국할 수 있으므로 서비스 테스트에서도 두 구독을 먼저 등록합니다.
+        // 실제 연결이 있어야 게임할 수 있으므로 서비스 테스트에서도 두 구독을 먼저 등록합니다.
         rooms.subscribe(code, host.token(), ignored -> {});
         rooms.subscribe(code, guest.token(), ignored -> {});
         int revision = rooms.state(code, host.token()).revision();
@@ -115,7 +115,7 @@ class RoomServiceTests {
     }
 
     @Test
-    // 퇴장한 방도 기존 참가자는 최종 상태를 읽을 수 있지만 새 입장/대국은 허용하지 않습니다.
+    // 퇴장한 방도 기존 참가자는 최종 상태를 읽을 수 있지만 새 입장/게임은 허용하지 않습니다.
     void leavingClosesBothParticipantsAndInvalidatesTheInvite() {
         Admission host = rooms.create("host");
         Admission guest = rooms.join(host.room().code(), "guest");
