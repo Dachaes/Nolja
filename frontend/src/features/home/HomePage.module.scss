@@ -17,7 +17,7 @@
 // 게임이 늘어나면 같은 크기의 정사각형 카드가 가운데에서 여러 열로 배치됩니다.
 .games {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 200px));
+  grid-template-columns: repeat(2, minmax(0, 200px));
   justify-content: center;
   gap: 16px;
   margin-top: 30px;
@@ -25,6 +25,7 @@
 .game {
   width: 100%;
   aspect-ratio: 1;
+  min-height: 190px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,11 +39,14 @@
   text-align: center;
   transition: border-color 120ms ease, background-color 120ms ease;
 
-  &:hover { border-color: var(--color-primary); background: var(--color-background); }
+  &:enabled:hover { border-color: var(--color-primary); background: var(--color-background); }
+  &:disabled { cursor: default; opacity: 1; }
   strong { font-size: 18px; font-weight: 650; }
   > span:not(.board) { color: var(--color-muted); font-size: 12px; line-height: 1.6; }
   small { color: var(--color-primary-hover); font-size: 11px; }
 }
+
+.mole { width: 64px; height: 64px; flex-shrink: 0; }
 
 // 카드의 작은 보드와 돌에도 실제 오셀로 보드와 같은 색상 토큰을 사용합니다.
 .board {

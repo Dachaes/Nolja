@@ -1,11 +1,15 @@
 import type { GameState, Player } from '../othello/types'
 import type { PlayerPresence, CloseReason } from './recovery/types'
+import type { MoleState } from '../mole/types'
+
+export type GameType = 'othello' | 'whack-a-mole'
 
 // 참가 대기 → 게임 진행 → 정상 종료, 또는 참가자 퇴장에 의한 방 폐쇄를 구분합니다.
 export type RoomStatus = 'waiting' | 'playing' | 'finished' | 'closed'
 
 // 초대받은 사람이 참가하기 전에도 볼 수 있는 최소 정보입니다. 토큰/보드는 포함하지 않습니다.
 export interface RoomPreview {
+  gameType?: GameType
   code: string
   status: RoomStatus
   hostNickname: string
@@ -15,6 +19,8 @@ export interface RoomPreview {
 
 // 인증된 참가자가 받는 방 전체 상태입니다. 보드는 서버 응답을 기준으로 표시합니다.
 export interface Room {
+  gameType?: GameType
+  mole?: MoleState | null
   code: string
   status: RoomStatus
   players: Player[]

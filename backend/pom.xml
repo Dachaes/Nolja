@@ -29,9 +29,9 @@
 		<tag/>
 		<url/>
 	</scm>
-	<!-- record 등 Java 21 환경을 기준으로 컴파일합니다. 실행 JDK도 해당 버전을 준비합니다. -->
+	<!-- Java 25 LTS 환경을 기준으로 컴파일하고 실행합니다. -->
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 	</properties>
 	<dependencies>
 		<!-- REST 컨트롤러, JSON 처리, 내장 서블릿 서버를 제공하는 웹 기능 묶음입니다. -->

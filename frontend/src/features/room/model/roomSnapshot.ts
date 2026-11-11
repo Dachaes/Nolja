@@ -1,4 +1,5 @@
 import type { Room } from '../types.ts'
+import { isMoleState } from '../../mole/model.ts'
 
 const isDate = (value: unknown) => typeof value === 'string' && Number.isFinite(Date.parse(value))
 
@@ -25,6 +26,12 @@ export function isRoomSnapshot(value: unknown): value is Room {
       && (player.reconnectDeadline === null || isDate(player.reconnectDeadline))
       && (!player.connected || player.reconnectDeadline === null))) return false
   if (room.status === 'closed' ? !['left', 'reconnect_timeout', 'expired'].includes(room.closeReason!) : room.closeReason !== null) return false
+  if (room.gameType === 'whack-a-mole') {
+    if (room.mole == null) return (room.status === 'waiting' || room.status === 'closed') && room.players.length === 1
+    return room.players.length === 2 && room.status !== 'waiting' && isMoleState(room.mole, playerIds)
+      && (room.status === 'closed' || room.mole.finished === (room.status === 'finished'))
+  }
+  if (room.gameType !== undefined && room.gameType !== 'othello') return false
   const game = room.game
   const isColor = (color: unknown) => color === null || color === 'black' || color === 'white'
   if (!game || !['playing', 'finished'].includes(game.status) || !isColor(game.currentTurn)

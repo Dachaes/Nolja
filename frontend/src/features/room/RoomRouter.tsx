@@ -31,6 +31,7 @@ export function RoomRouter() {
   // RoomPage의 key가 달라지면 이전 방의 React 상태를 버리고 새 방 상태로 시작합니다.
   if (pathname === '/') return <HomePage />
   if (pathname === '/games/othello') return <RoomEntry onAdmitted={admitted} />
+  if (pathname === '/games/whack-a-mole') return <RoomEntry gameType="whack-a-mole" onAdmitted={admitted} />
   if (match) {
     const code = match[1].toUpperCase()
     return <RoomPage key={code} code={code} initialSession={created?.room.code === code ? created : undefined} onHome={home} />

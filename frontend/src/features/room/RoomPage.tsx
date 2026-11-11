@@ -14,6 +14,7 @@ import { RecoveryNotice } from './recovery/RecoveryNotice'
 import { allPlayersConnected } from './recovery/recoveryState'
 import type { Admission, RoomSession } from './types'
 import styles from './RoomPage.module.scss'
+import { MoleGame } from '../mole/MoleGame'
 
 // 방 코드와 기존 참가 정보를 받아, 입장 전/후 화면을 결정하는 페이지의 입력값입니다.
 interface RoomPageProps {
@@ -52,7 +53,7 @@ function ConnectedRoom({ code, session, onHome }: { code: string; session: RoomS
   const bothConnected = !!room && allPlayersConnected(room)
   // 화면에서도 입력을 제한하지만 최종 권한과 차례 검사는 서버가 다시 수행합니다.
   // 연결 오류나 다른 요청 처리 중에는 오래된 보드에 착수하지 못하게 합니다.
-  const canPlay = !!room && room.status === 'playing' && room.game.currentTurn === me?.color
+  const canPlay = !!room && room.gameType !== 'whack-a-mole' && room.status === 'playing' && room.game.currentTurn === me?.color
     && connection.status === 'connected' && bothConnected && !terminal && !move.isPending && !lobby.pending
   const activityLabel = room?.status === 'closed' ? '게임 종료'
     : connection.status !== 'connected' ? '연결 복구 중' : !bothConnected ? '게임 일시정지' : undefined
@@ -83,7 +84,10 @@ function ConnectedRoom({ code, session, onHome }: { code: string; session: RoomS
         {!room && !query.isError && <main className={styles.state} role="status">방에 연결하는 중…</main>}
         {/* 상대가 입장해 서버 상태가 playing으로 바뀌면 대기실에서 보드로 전환됩니다. */}
         {room && me && (room.status === 'waiting'
-          ? <WaitingRoom code={code} host={me} onLeave={() => void lobby.returnToLobby()} leaving={lobby.pending} />
+          ? <WaitingRoom code={code} host={me} gameType={room.gameType} onLeave={() => void lobby.returnToLobby()} leaving={lobby.pending} />
+          : room.gameType === 'whack-a-mole'
+          ? room.mole && <MoleGame key={room.gameNumber} room={room} session={session} connected={connection.status === 'connected' && !terminal}
+              bothConnected={bothConnected} serverOffset={connection.serverOffset} leaving={lobby.pending} onLeave={() => void lobby.returnToLobby()} />
           : <OthelloGame game={room.game} players={room.players} me={me} canPlay={canPlay} gameNumber={room.gameNumber}
               roomClosed={room.status === 'closed'} activityLabel={activityLabel}
               onPlay={position => void placeDisc(position)} onLeave={() => void lobby.returnToLobby()} leaving={lobby.pending}

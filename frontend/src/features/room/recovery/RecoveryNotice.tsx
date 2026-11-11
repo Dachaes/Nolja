@@ -28,14 +28,14 @@ interface RecoveryNoticeProps {
 export function RecoveryNotice({ room, status, serverOffset, onLobby }: RecoveryNoticeProps) {
   if (room.status === 'closed') return <section className={styles.notice} aria-label="방 종료 안내">
     <p role="alert">{closedRoomMessage(room.closeReason)}</p>
-    {room.game.status !== 'finished' && <>
+    {!(room.gameType === 'whack-a-mole' ? room.mole?.finished : room.game.status === 'finished') && <>
       <p className={styles.help}>마지막 보드를 보관했어요. 이 게임의 승패는 기록하지 않습니다.</p>
       <button type="button" onClick={onLobby}>로비로 돌아가기</button>
     </>}
   </section>
   if (status !== 'connected') return <section className={styles.notice} aria-label="게임 복구 안내">
     <p>마지막으로 확인한 보드를 보여드리고 있어요.</p>
-    <p className={styles.help}>연결을 확인한 뒤 같은 참가자와 차례로 이어갑니다.</p>
+    <p className={styles.help}>{room.gameType === 'whack-a-mole' ? '두 사람이 다시 연결되면 남은 시간과 점수를 이어갑니다.' : '연결을 확인한 뒤 같은 참가자와 차례로 이어갑니다.'}</p>
   </section>
   const missing = room.presence.filter(player => !player.connected)
   if (!missing.length) return null
@@ -43,7 +43,7 @@ export function RecoveryNotice({ room, status, serverOffset, onLobby }: Recovery
   const deadline = missing.map(player => player.reconnectDeadline).filter((value): value is string => !!value).sort()[0]
   return <section className={styles.notice} aria-label="상대 연결 안내">
     <p role="status">{names}님의 연결을 기다리고 있어요.</p>
-    <p className={styles.help}>{room.status === 'finished' ? '다시 연결되면 재대결할 수 있어요.' : '게임을 잠시 멈췄어요. 돌아오면 같은 보드와 차례로 이어갑니다.'}</p>
+    <p className={styles.help}>{room.status === 'finished' ? '다시 연결되면 재대결할 수 있어요.' : room.gameType === 'whack-a-mole' ? '시간을 잠시 멈췄어요. 돌아오면 남은 시간과 점수를 이어갑니다.' : '게임을 잠시 멈췄어요. 돌아오면 같은 보드와 차례로 이어갑니다.'}</p>
     {deadline && <RecoveryCountdown deadline={deadline} serverOffset={serverOffset} />}
   </section>
 }

@@ -1,6 +1,6 @@
 import type { Position } from '../../othello/types'
 import { backendOrigin } from '../../../config/backend'
-import type { Admission, Room, RoomPreview, RoomSession } from '../types'
+import type { Admission, GameType, Room, RoomPreview, RoomSession } from '../types'
 
 // 서버의 오류 코드와 HTTP 상태를 함께 보관해 화면이 오류 종류별로 대응하게 합니다.
 // status=0은 HTTP 응답 자체를 받지 못한 네트워크 오류를 뜻합니다.
@@ -56,7 +56,9 @@ async function request<T>(path: string, options: RequestInit = {}, session?: Roo
 // URL과 요청 데이터 구성을 모아 둡니다. 화면은 fetch의 세부 사항을 몰라도 됩니다.
 // create/join은 참가 토큰 발급, preview는 공개 조회, 나머지는 참가자 전용입니다.
 export const roomApi = {
-  create: (nickname: string) => request<Admission>('', { method: 'POST', body: JSON.stringify({ nickname }) }),
+  create: (nickname: string, gameType: GameType = 'othello') => request<Admission>('', { method: 'POST', body: JSON.stringify({ nickname, gameType }) }),
+  hit: (code: string, session: RoomSession, hole: number, moleId: number | null, gameNumber: number) =>
+    request<Room>(`/${code}/hits`, { method: 'POST', body: JSON.stringify({ hole, moleId, gameNumber }) }, session),
   preview: (code: string, signal?: AbortSignal) => request<RoomPreview>(`/${encodeURIComponent(code)}`, { signal }),
   join: (code: string, nickname: string) => request<Admission>(`/${encodeURIComponent(code)}/players`, { method: 'POST', body: JSON.stringify({ nickname }) }),
   state: (code: string, session: RoomSession, signal?: AbortSignal) => request<Room>(`/${code}/state`, { signal }, session),

@@ -25,7 +25,7 @@ Vercel에서는 필요한 Production / Preview 환경에 변수를 각각 설정
 
 ## 백엔드와 DB
 
-Vercel에는 프런트엔드만 배포합니다. Spring Boot / Java 21 백엔드는 HTTPS와 WebSocket 연결을 지원하는 별도 서버에서 실행해야 합니다. 브라우저가 백엔드로 직접 연결합니다.
+Vercel에는 프런트엔드만 배포합니다. Spring Boot / Java 25 LTS 백엔드는 HTTPS와 WebSocket 연결을 지원하는 별도 서버에서 실행해야 합니다. 브라우저가 백엔드로 직접 연결합니다.
 
 백엔드 주소가 없으면 화면 배포는 가능하지만 방 생성·입장·실시간 대전은 동작하지 않습니다. `localhost`를 배포 환경 변수로 입력해도 개발 PC의 서버에 연결되지 않습니다.
 

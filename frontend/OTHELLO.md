@@ -4,13 +4,13 @@ Vercel 프런트엔드 배포는 [VERCEL.md](VERCEL.md)를 참고하세요. 프�
 
 ## 실행
 
-Node.js 24와 Java 21 기준입니다. **백엔드와 프런트엔드를 함께 실행해야 합니다.**
+Node.js 24와 Java 25 LTS 기준입니다. **백엔드와 프런트엔드를 함께 실행해야 합니다.**
 
 터미널 1, Git Bash:
 
 ```bash
 cd backend
-export JAVA_HOME=../.tools/jdk-21.0.13.0.2+1
+export JAVA_HOME="$(find ../.tools -maxdepth 1 -type d -name 'jdk-25*' | sort -V | tail -n 1)"
 export PATH="$JAVA_HOME/bin:$PATH"
 ./mvnw spring-boot:run
 ```

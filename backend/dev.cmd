@@ -3,7 +3,7 @@ rem 이 스크립트 안에서 바꾼 환경 변수는 종료 시 원래 터미�
 setlocal
 rem JAVA_HOME이 지정되지 않았을 때만 프로젝트 로컬 JDK를 찾습니다.
 if not defined JAVA_HOME (
-  for /d %%D in ("%~dp0..\.tools\jdk-*") do if exist "%%~fD\bin\java.exe" set "JAVA_HOME=%%~fD"
+  for /d %%D in ("%~dp0..\.tools\jdk-25*") do if exist "%%~fD\bin\java.exe" set "JAVA_HOME=%%~fD"
 )
 rem Maven이 선택한 JDK의 java 명령을 찾을 수 있도록 현재 프로세스의 PATH에 추가합니다.
 if defined JAVA_HOME set "PATH=%JAVA_HOME%\bin;%PATH%"

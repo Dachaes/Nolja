@@ -41,7 +41,7 @@ export function RematchPanel({ room, session, connected, closed, leaving, onLobb
 
   return <div className={styles.panel}>
     <p className={styles.message} role="status">{message}</p>
-    {!closed && <p className={styles.help}>재대결은 흑백을 바꿔 시작해요.</p>}
+    {!closed && <p className={styles.help}>{room.gameType === 'whack-a-mole' ? '점수와 콤보를 초기화하고 30초 동안 다시 겨뤄요.' : '재대결은 흑백을 바꿔 시작해요.'}</p>}
     {rematch.error && !closed && <p className={styles.error} role="alert">{rematch.error.message}</p>}
     <div className={styles.buttons}>
       {!closed && <button type="button" className={styles.primary} disabled={disabled} onClick={() => void changeReady()}>

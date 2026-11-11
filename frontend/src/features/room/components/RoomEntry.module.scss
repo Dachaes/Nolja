@@ -1,5 +1,6 @@
 // 닉네임 입력/초대 입장 화면의 공통 배경입니다.
 .page { min-height: 100svh; background: var(--color-background); }
+.moleIcon { width: 72px; height: 72px; }
 // 카드 너비는 최대 360px, 위쪽 간격은 화면 높이에 따라 32~90px 사이로 조절합니다.
 .card { width: min(100% - 40px, 360px); margin: clamp(32px, 9vh, 90px) auto 0; padding-bottom: 40px; text-align: center; }
 // 흑·백 돌을 조금 겹쳐 놓아 입장 화면의 작은 장식으로 사용합니다.

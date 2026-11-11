@@ -1,6 +1,6 @@
 # Doran(도란) 방 서버
 
-Java 21, Spring Boot, Maven을 사용합니다. 데이터베이스 없이 방과 게임을 단일 서버 메모리에 저장합니다.
+Java 25 LTS, Spring Boot, Maven을 사용합니다. 데이터베이스 없이 방과 게임을 단일 서버 메모리에 저장합니다.
 
 ## 실행
 
@@ -8,18 +8,18 @@ Git Bash에서 프로젝트 루트 기준:
 
 ```bash
 cd backend
-export JAVA_HOME=../.tools/jdk-21.0.13.0.2+1
+export JAVA_HOME="$(find ../.tools -maxdepth 1 -type d -name 'jdk-25*' | sort -V | tail -n 1)"
 export PATH="$JAVA_HOME/bin:$PATH"
 ./mvnw spring-boot:run
 ```
 
-위 `JAVA_HOME`은 현재 프로젝트의 로컬 Java 21 경로입니다. 해당 폴더는 Git에서 제외됩니다. 시스템에 Java 21이 설정되어 있다면 `cd backend` 후 `./mvnw spring-boot:run`만 실행하면 됩니다. 종료는 실행 중인 Git Bash에서 `Ctrl+C`입니다.
+위 명령은 프로젝트 로컬 Java 25 경로를 선택합니다. 해당 폴더는 Git에서 제외됩니다. 시스템에 Java 25가 설정되어 있다면 `cd backend` 후 `./mvnw spring-boot:run`만 실행하면 됩니다. 종료는 실행 중인 Git Bash에서 `Ctrl+C`입니다.
 
 PowerShell에서는 다음 명령을 사용합니다.
 
 ```powershell
 cd backend
-$env:JAVA_HOME = (Get-ChildItem ..\.tools -Directory -Filter 'jdk-*' | Select-Object -First 1).FullName
+$env:JAVA_HOME = (Get-ChildItem ..\.tools -Directory -Filter 'jdk-25*' | Sort-Object Name -Descending | Select-Object -First 1).FullName
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 .\mvnw.cmd spring-boot:run
 ```
@@ -137,10 +137,10 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 ## 테스트
 
-Java 21의 `JAVA_HOME`을 설정한 뒤 `./mvnw -B -ntp test`를 실행합니다. 프로젝트 로컬 JDK를 사용하는 PowerShell 예:
+Java 25의 `JAVA_HOME`을 설정한 뒤 `./mvnw -B -ntp test`를 실행합니다. 프로젝트 로컬 JDK를 사용하는 PowerShell 예:
 
 ```powershell
-$env:JAVA_HOME = (Get-ChildItem ../.tools -Directory -Filter 'jdk-*' | Select-Object -First 1).FullName
+$env:JAVA_HOME = (Get-ChildItem ../.tools -Directory -Filter 'jdk-25*' | Sort-Object Name -Descending | Select-Object -First 1).FullName
 .\mvnw.cmd -B -ntp test
 ```
 
