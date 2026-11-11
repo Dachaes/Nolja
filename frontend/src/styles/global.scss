@@ -1,4 +1,13 @@
 // 이 파일의 공통 스타일은 앱 전체에 적용합니다.
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-1Thin.ttf') format('truetype'); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-2ExtraLight.ttf') format('truetype'); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-3Light.ttf') format('truetype'); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-4Regular.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-5Medium.ttf') format('truetype'); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-6SemiBold.ttf') format('truetype'); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-7Bold.ttf') format('truetype'); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-8ExtraBold.ttf') format('truetype'); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-9Black.ttf') format('truetype'); font-style: normal; font-weight: 900; font-display: swap; }
 // 색상 토큰은 여기서 한 번 정의하고 각 컴포넌트가 var(...)로 참조합니다. 색상표는 루트 color.md입니다.
 :root {
   --color-background: #f3f0ed;
@@ -24,9 +33,7 @@
   --color-shadow: #242b23;
   --color-error: #a14f44;
 
-  // 설치된 글꼴 중 앞에서부터 사용합니다. 별도의 웹폰트 다운로드를 요청하지 않습니다.
-  font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', 'Malgun Gothic', sans-serif;
+  font-family: Paperlogy, 'Malgun Gothic', sans-serif;
   color: var(--color-text);
   background: var(--color-background);
   // 시스템 다크 모드에서도 밝은 보드 디자인을 유지합니다.
