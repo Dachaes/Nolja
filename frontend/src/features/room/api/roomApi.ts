@@ -1,4 +1,5 @@
 import type { Position } from '../../othello/types'
+import { backendOrigin } from '../../../config/backend'
 import type { Admission, Room, RoomPreview, RoomSession } from '../types'
 
 // 서버의 오류 코드와 HTTP 상태를 함께 보관해 화면이 오류 종류별로 대응하게 합니다.
@@ -24,7 +25,7 @@ export const isTerminalError = (error: unknown) =>
 async function request<T>(path: string, options: RequestInit = {}, session?: RoomSession): Promise<T> {
   let response: Response
   try {
-    response = await fetch(`/api/rooms${path}`, {
+    response = await fetch(`${backendOrigin}/api/rooms${path}`, {
       ...options,
       // 최신 보드를 받고, 외부 취소 신호 또는 8초 제한 중 먼저 오는 것을 적용합니다.
       cache: 'no-store',

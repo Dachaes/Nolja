@@ -1,4 +1,5 @@
 import { isTerminalError, RoomApiError } from '../api/roomApi'
+import { backendOrigin } from '../../../config/backend'
 import type { Room, RoomSession } from '../types'
 import { decodeRoomMessage, roomSocketUrl, type ConnectionStatus } from './protocol'
 
@@ -56,7 +57,7 @@ export function connectRoom({ code, session, onRoom, onStatus, onError }: RoomCo
     if (!navigator.onLine) { setStatus('offline'); return }
     stopSocket()
     const currentGeneration = generation
-    const current = new WebSocket(roomSocketUrl(window.location.origin, code))
+    const current = new WebSocket(roomSocketUrl(backendOrigin || window.location.origin, code))
     socket = current
     const active = () => !disposed && !suspended && currentGeneration === generation
 

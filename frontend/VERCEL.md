@@ -1,40 +1,43 @@
 # Vercel 프런트엔드 배포
 
-## Git 저장소 연결
+## 프로젝트 설정
 
-1. 변경한 소스를 Git 저장소에 커밋하고 푸시합니다.
-2. Vercel에서 **Add New → Project**로 저장소를 가져옵니다.
-3. **Root Directory를 `frontend`로 지정합니다.** 루트의 backend 폴더는 배포 대상이 아닙니다.
-4. Framework Preset은 **Vite**, Node.js Version은 **24.x**로 선택합니다.
-5. Deploy를 누릅니다.
+1. 소스를 커밋·푸시한 뒤 Vercel에서 Add New → Project로 저장소를 가져옵니다.
+2. **Root Directory: `frontend`**, **Framework Preset: Vite**, **Node.js Version: 24.x**를 지정합니다.
+3. 백엔드가 배포되어 있다면 아래 환경 변수를 설정한 뒤 Deploy를 누릅니다.
 
-`frontend/vercel.json`에 설치 `npm ci`, 빌드 `npm run build`, 결과 폴더 `dist`를 지정했습니다. Vercel 대시보드에 다른 값을 설정했다면 위 값과 맞추세요. 이후 연결한 브랜치에 푸시하면 자동으로 다시 배포됩니다.
+`vercel.json`에 설치 `npm ci`, 빌드 `npm run build`, 출력 `dist`가 지정되어 있습니다. `/games/*`, `/room/*` 직접 접속과 새로고침을 지원합니다. 해시가 붙는 `/assets/*`는 장기 캐시합니다.
 
-## 주소와 새로고침
+## 환경 변수
 
-`/`는 기본 index.html을 엽니다. `/games/othello`, `/room/ABCDEF`처럼 React가 처리하는 주소도 index.html로 연결하므로 직접 접속과 새로고침이 가능합니다. `/api`와 `/ws`는 HTML로 바꾸지 않습니다.
+| 설정 위치 | 이름 | 예시 |
+| --- | --- | --- |
+| Vercel 프런트엔드 | `VITE_BACKEND_ORIGIN` | `https://api.example.com` |
+| 별도 백엔드 서버 | `FRONTEND_ALLOWED_ORIGINS` | `https://doran.vercel.app` |
 
-## 현재 배포 범위
+예시는 실제 배포 주소로 바꾸세요. 프런트 변수에는 `https://`를 포함한 백엔드 출처만 입력하고 `/api`, `/ws` 등의 경로는 붙이지 않습니다. HTTP 요청은 `/api/rooms`, 실시간 연결은 `wss://.../ws/rooms/...`으로 자동 구성됩니다.
 
-지금은 공개 백엔드 주소가 없어 화면 배포만 준비되어 있습니다. 게임 선택과 닉네임 입력 화면은 볼 수 있지만, 방 생성·입장과 실시간 대전은 백엔드 연결 후 사용할 수 있습니다.
+백엔드 허용 출처에는 실제 프런트엔드 주소를 경로와 마지막 `/` 없이 입력합니다. 여러 주소는 쉼표로 구분합니다. 예: `https://doran.vercel.app,https://doran.example.com`. Preview 배포도 연결하려면 해당 출처를 명시적으로 추가하고 백엔드를 재시작합니다.
 
-Vite의 `server.proxy`와 `NOLJA_API_TARGET`은 로컬 개발 서버용입니다. Vercel의 정적 배포에는 적용되지 않습니다. Vercel 환경 변수에 localhost 주소를 입력해도 개발 PC의 백엔드로 연결되지 않습니다.
+Vercel에서는 필요한 Production / Preview 환경에 변수를 각각 설정합니다. `VITE_` 변수는 빌드 시 공개 번들에 포함되므로 비밀키를 넣지 마세요. 값을 변경한 뒤에는 **Redeploy**해야 합니다.
 
-백엔드를 배포하면 다음 설정을 이어서 적용합니다.
+로컬 환경 변수 예시는 `.env.example`입니다. 필요하면 `.env.local`로 복사합니다. 비워 두면 기존 Vite 프록시를 사용합니다. `NOLJA_API_TARGET`은 로컬 개발 프록시 대상이며 Vercel 정적 배포에는 적용되지 않습니다.
 
-- Vercel의 `/api/*` 요청을 배포한 Spring 백엔드로 전달하도록 외부 rewrite 설정.
-- WebSocket의 배포 주소와 Spring의 허용 Origin 설정. 현재 `/ws`는 같은 출처의 로컬 프록시를 사용합니다.
+## 백엔드와 DB
 
-실제 백엔드 주소가 정해지면 방 생성·초대 링크 입장·WebSocket 연결까지 배포 환경에서 확인해야 합니다. DB와 외부 로그인 설정은 필요하지 않습니다.
+Vercel에는 프런트엔드만 배포합니다. Spring Boot / Java 21 백엔드는 HTTPS와 WebSocket 연결을 지원하는 별도 서버에서 실행해야 합니다. 브라우저가 백엔드로 직접 연결합니다.
 
-## 로컬 빌드 확인
+백엔드 주소가 없으면 화면 배포는 가능하지만 방 생성·입장·실시간 대전은 동작하지 않습니다. `localhost`를 배포 환경 변수로 입력해도 개발 PC의 서버에 연결되지 않습니다.
 
-```bash
-cd frontend
-npm ci
-npm run build
-```
+현재 DB는 사용하지 않습니다. 방과 게임 상태는 서버 메모리에 저장되므로 재시작하면 사라집니다. 백엔드는 단일 인스턴스로 운영해야 하며 여러 인스턴스 간 상태는 공유되지 않습니다.
 
-Vercel CLI를 사용하면 생성되는 `.vercel/` 폴더는 Git에서 제외됩니다. `vercel.json`, `package-lock.json`, 소스와 공개 정적 파일은 커밋합니다.
+## 배포 확인
 
-공식 참고: [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite), [Rewrites](https://vercel.com/docs/routing/rewrites).
+1. `/`, `/games/othello`를 열고 새로고침합니다.
+2. 방 생성 후 다른 브라우저에서 초대 링크로 입장합니다.
+3. 양쪽 착수와 새로고침 후 재연결을 확인합니다.
+4. 연결 실패 시 백엔드 주소, HTTPS 인증서, 허용 출처와 WebSocket 지원을 확인합니다.
+
+로컬 검증: `npm ci`, `npm run build`, `npm run lint`, `npm test`.
+
+공식 참고: [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite).

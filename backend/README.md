@@ -146,4 +146,4 @@ $env:JAVA_HOME = (Get-ChildItem ../.tools -Directory -Filter 'jdk-*' | Select-Ob
 
 배포할 때는 프런트엔드와 같은 도메인의 `/api`, `/ws`를 이 서버로 프록시하고, 프런트엔드 `/room/*` 요청을 SPA의 `index.html`로 연결해야 합니다. `/ws`에는 WebSocket의 `Upgrade`·`Connection` 헤더와 원래 `Host`를 전달해야 합니다. HTTPS 페이지는 자동으로 `wss:`를 사용합니다. 프록시가 TLS를 종료하는 경우 Spring이 원래 HTTPS 출처를 알 수 있도록, 신뢰하는 프록시에서만 전달 헤더를 설정·처리하세요.
 
-WebSocket은 Spring의 기본 동일 출처 검사를 유지합니다. 관련 설정은 [Spring WebSocket 서버 문서](https://docs.spring.io/spring-framework/reference/web/websocket/server.html)를 참고하세요.
+위 설명은 동일 출처 프록시 배포 방식입니다. Vercel에 프런트엔드를 별도로 배포할 때는 프런트엔드의 `VITE_BACKEND_ORIGIN`에 백엔드 HTTPS 출처를 지정하고, 백엔드의 `FRONTEND_ALLOWED_ORIGINS`에 프런트엔드 출처를 지정합니다. 예: `https://doran.vercel.app`. 여러 출처는 쉼표로 구분하며 경로나 마지막 `/`는 붙이지 않습니다. 변경 후 백엔드를 재시작합니다. HTTP CORS와 WebSocket에 같은 허용 목록이 적용됩니다. 비어 있으면 기존 동일 출처 방식으로 동작합니다. 자세한 절차는 [Vercel 배포 안내](../frontend/VERCEL.md)를 참고하세요.

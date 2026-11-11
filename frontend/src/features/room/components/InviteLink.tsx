@@ -7,8 +7,6 @@ export function InviteLink({ code }: { code: string }) {
   const link = new URL(`/room/${code}`, window.location.origin).href
   const [feedback, setFeedback] = useState('')
   const [showLink, setShowLink] = useState(false)
-  // localhost는 받는 사람 자신의 기기를 가리키므로 다른 기기로 공유할 때 안내가 필요합니다.
-  const localOnly = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname)
 
   // 자동 복사는 HTTPS/권한 등에 영향을 받습니다. 실패해도 직접 선택할 수 있는 링크를 제공합니다.
   async function copy() {
@@ -32,7 +30,6 @@ export function InviteLink({ code }: { code: string }) {
       <p className={styles.feedback} role="status">{feedback || '친구에게 링크를 보내 함께 시작하세요.'}</p>
       {/* 수동 복사용 필드는 포커스를 받으면 링크 전체를 선택합니다. */}
       {showLink && <input className={styles.link} aria-label="초대 링크" readOnly value={link} onFocus={event => event.currentTarget.select()} />}
-      {/* {localOnly && <p className={styles.localHelp}>다른 기기로 초대하려면 이 페이지를 PC의 LAN IP 또는 배포 주소로 열어 주세요.</p>} */}
     </div>
   )
 }
