@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test'
 
 // 실제 브라우저와 실행 중인 백엔드를 연결해 사용자 흐름 전체를 확인하는 E2E 테스트입니다.
-test('two devices create, copy an invite, join, play only their turns, reload and leave', async ({ browser }) => {
+test('two devices create, copy an invite, join, play only their turns, reload and leave', async ({
+  browser,
+}) => {
   // 브라우저 context를 나누면 쿠키와 저장소가 분리되어 서로 다른 기기의 참가자를 재현할 수 있습니다.
   // 화면 크기도 데스크톱/모바일로 나눠 같은 상태를 각자 제대로 표시하는지 확인합니다.
   const hostContext = await browser.newContext({ viewport: { width: 1280, height: 900 } })
@@ -14,13 +16,19 @@ test('two devices create, copy an invite, join, play only their turns, reload an
   const errors: string[] = []
   // 계정 API가 없어도 홈부터 게임까지 가능해야 합니다. 숨은 로그인 의존성이 다시 생기면 실패합니다.
   const accountRequests: string[] = []
-  for (const page of [host, guest]) page.on('request', request => {
-    if (/\/api\/(auth|account|friends)(\/|$)/.test(request.url())) accountRequests.push(request.url())
-  })
+  for (const page of [host, guest])
+    page.on('request', request => {
+      if (/\/api\/(auth|account|friends)(\/|$)/.test(request.url()))
+        accountRequests.push(request.url())
+    })
   // 정상 게임에서 /state 요청 없이 WebSocket만으로 보드가 동기화되는지 확인합니다.
   const stateRequests: string[] = []
-  host.on('request', request => { if (request.url().endsWith('/state')) stateRequests.push(request.url()) })
-  guest.on('request', request => { if (request.url().endsWith('/state')) stateRequests.push(request.url()) })
+  host.on('request', request => {
+    if (request.url().endsWith('/state')) stateRequests.push(request.url())
+  })
+  guest.on('request', request => {
+    if (request.url().endsWith('/state')) stateRequests.push(request.url())
+  })
   host.on('pageerror', error => errors.push(error.message))
   guest.on('pageerror', error => errors.push(error.message))
   try {
@@ -37,7 +45,9 @@ test('two devices create, copy an invite, join, play only their turns, reload an
     expect(invite).toMatch(/\/room\/[A-HJ-NP-Z2-9]{6}$/)
     await expect(host.getByRole('grid')).toHaveCount(0)
     // 일반 HTTP 환경에서 Clipboard API가 없을 때를 재현해 수동 복사가 가능한지 확인합니다.
-    await host.evaluate(() => Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true }))
+    await host.evaluate(() =>
+      Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true }),
+    )
     await host.getByRole('button', { name: '초대 링크 복사' }).click()
     await expect(host.getByLabel('초대 링크', { exact: true })).toHaveValue(invite)
     await host.screenshot({ path: 'test-results/waiting-desktop.png', fullPage: true })
@@ -54,7 +64,9 @@ test('two devices create, copy an invite, join, play only their turns, reload an
     await expect(host.getByRole('grid')).toBeVisible()
     await expect(host.getByText('민서 (나)', { exact: true })).toBeVisible()
     await expect(guest.getByText('지훈 (나)', { exact: true })).toBeVisible()
-    await expect(guest.getByRole('button', { name: 'D3, 놓을 수 없음', exact: true })).toBeDisabled()
+    await expect(
+      guest.getByRole('button', { name: 'D3, 놓을 수 없음', exact: true }),
+    ).toBeDisabled()
 
     // 이미 두 명이 들어간 초대 링크에서는 세 번째 사람에게 입장 폼을 제공하지 않습니다.
     await third.goto(invite)
@@ -70,10 +82,14 @@ test('two devices create, copy an invite, join, play only their turns, reload an
     // 같은 탭 새로고침 후에도 참가 토큰으로 복귀하여 이미 진행한 보드가 보여야 합니다.
     await host.reload()
     await expect(host.getByRole('grid')).toBeVisible()
-    await expect(host.getByRole('button', { name: 'C3, 백 돌, 마지막 수', exact: true })).toBeVisible()
+    await expect(
+      host.getByRole('button', { name: 'C3, 백 돌, 마지막 수', exact: true }),
+    ).toBeVisible()
     await expect(guest.getByRole('button', { name: /놓을 수 있음/ })).toHaveCount(0)
     // 모바일에서 가로 스크롤이 생기지 않는지 확인하고 점검용 스크린샷을 저장합니다.
-    expect(await guest.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    expect(
+      await guest.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true)
     await host.screenshot({ path: 'test-results/game-desktop.png', fullPage: true })
     await guest.screenshot({ path: 'test-results/game-mobile.png', fullPage: true })
     // 퇴장 확인창을 수락하면 본인은 홈으로, 남은 상대는 종료 안내로 전환되어야 합니다.
@@ -84,28 +100,39 @@ test('two devices create, copy an invite, join, play only their turns, reload an
     expect(errors).toEqual([])
     expect(stateRequests).toEqual([])
     expect(accountRequests).toEqual([])
-  // 테스트가 실패해도 열린 브라우저 context를 닫아 다음 테스트에 영향을 주지 않게 합니다.
+    // 테스트가 실패해도 열린 브라우저 context를 닫아 다음 테스트에 영향을 주지 않게 합니다.
   } finally {
     await Promise.all([hostContext.close(), guestContext.close(), thirdContext.close()])
   }
 })
 
 // 소켓만 끊어 HTTP 요청 실패와 구분합니다. 재연결 전에는 입력을 막고 최신 보드로 복귀해야 합니다.
-test('a disconnected player cannot move and reconnects to the latest board without polling', async ({ browser }) => {
+test('a disconnected player cannot move and reconnects to the latest board without polling', async ({
+  browser,
+}) => {
   const hostContext = await browser.newContext()
   const guestContext = await browser.newContext()
   const host = await hostContext.newPage()
   const guest = await guestContext.newPage()
   let blocked = false
-  let disconnect = async () => { throw new Error('아직 연결된 소켓이 없습니다.') }
+  let disconnect = async () => {
+    throw new Error('아직 연결된 소켓이 없습니다.')
+  }
   const stateRequests: string[] = []
-  host.on('request', request => { if (request.url().endsWith('/state')) stateRequests.push(request.url()) })
+  host.on('request', request => {
+    if (request.url().endsWith('/state')) stateRequests.push(request.url())
+  })
 
   // 평소에는 실제 서버로 그대로 전달하고, 장애 구간에만 연결을 종료합니다.
   await host.routeWebSocket('**/ws/games/*/rooms/*', async socket => {
-    if (blocked) { await socket.close({ code: 4000 }); return }
+    if (blocked) {
+      await socket.close({ code: 4000 })
+      return
+    }
     const server = socket.connectToServer()
-    disconnect = async () => { await Promise.all([socket.close({ code: 4000 }), server.close()]) }
+    disconnect = async () => {
+      await Promise.all([socket.close({ code: 4000 }), server.close()])
+    }
   })
 
   try {
@@ -133,14 +160,20 @@ test('a disconnected player cannot move and reconnects to the latest board witho
     blocked = true
     await disconnect()
     await expect(host.getByRole('button', { name: '다시 연결', exact: true })).toBeVisible()
-    await expect(guest.getByText('흑기사님의 연결을 기다리고 있어요.', { exact: true })).toBeVisible()
+    await expect(
+      guest.getByText('흑기사님의 연결을 기다리고 있어요.', { exact: true }),
+    ).toBeVisible()
     await expect(guest.getByRole('button', { name: /놓을 수 있음/ })).toHaveCount(0)
-    await expect(host.getByRole('button', { name: 'D3, 흑 돌, 마지막 수', exact: true })).toBeVisible()
+    await expect(
+      host.getByRole('button', { name: 'D3, 흑 돌, 마지막 수', exact: true }),
+    ).toBeVisible()
     blocked = false
     await host.getByRole('button', { name: '다시 연결', exact: true }).click()
     await expect(host.getByText('실시간 연결됨', { exact: true })).toBeVisible()
     await guest.getByRole('button', { name: 'C3, 놓을 수 있음', exact: true }).click()
-    await expect(host.getByRole('button', { name: 'C3, 백 돌, 마지막 수', exact: true })).toBeVisible()
+    await expect(
+      host.getByRole('button', { name: 'C3, 백 돌, 마지막 수', exact: true }),
+    ).toBeVisible()
     await expect(host.getByText('내 차례', { exact: true })).toBeVisible()
     expect(stateRequests).toEqual([])
   } finally {
@@ -149,7 +182,9 @@ test('a disconnected player cannot move and reconnects to the latest board witho
 })
 
 // 아주 작은 화면에서도 잘못된 주소에서 돌아오고 입력 오류를 고칠 수 있는지 확인합니다.
-test('invalid links and nickname validation stay recoverable on a small phone', async ({ page }) => {
+test('invalid links and nickname validation stay recoverable on a small phone', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 320, height: 740 })
   await page.goto('/room/bad-link')
   await expect(page.getByRole('heading', { name: '올바른 초대 링크가 아니에요' })).toBeVisible()
@@ -160,5 +195,7 @@ test('invalid links and nickname validation stay recoverable on a small phone', 
   await page.getByLabel('닉네임', { exact: true }).fill('a')
   await page.getByRole('button', { name: '방 만들기', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('2~12자')
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  )
 })

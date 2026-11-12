@@ -8,9 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BackendApplication {
 
-	// 명령행 옵션을 Spring에 전달해 포트나 실행 환경 설정을 적용합니다.
-	public static void main(String[] args) {
-		SpringApplication.run(BackendApplication.class, args);
-	}
-
+    // 명령행 옵션을 Spring에 전달해 포트나 실행 환경 설정을 적용합니다.
+    public static void main(String[] args) {
+        SpringApplication.run(BackendApplication.class, args);
+    }
 }

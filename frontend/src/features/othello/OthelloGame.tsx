@@ -26,7 +26,19 @@ interface OthelloGameProps {
 }
 
 // 서버 보드에서 점수·가능한 수·결과를 계산하여 기능별 컴포넌트에 나눠 전달합니다.
-export function OthelloGame({ game, players, me, canPlay, onPlay, onLeave, leaving, gameNumber, finishedActions, roomClosed, activityLabel }: OthelloGameProps) {
+export function OthelloGame({
+  game,
+  players,
+  me,
+  canPlay,
+  onPlay,
+  onLeave,
+  leaving,
+  gameNumber,
+  finishedActions,
+  roomClosed,
+  activityLabel,
+}: OthelloGameProps) {
   const [showHints, setShowHints] = useState(true)
   const score = getScore(game.board)
   // 내 차례가 아니면 가능한 수를 빈 배열로 전달해 보드 클릭도 함께 비활성화합니다.
@@ -43,16 +55,43 @@ export function OthelloGame({ game, players, me, canPlay, onPlay, onLeave, leavi
   return (
     <main className={styles.game} aria-label="오셀로 온라인 대전">
       <PlayerPanel players={players} currentTurn={game.currentTurn} myPlayerId={me.playerId} />
-      <ScoreBoard score={score} currentTurn={game.currentTurn} myColor={me.color} activityLabel={game.status === 'playing' ? activityLabel : undefined} />
+      <ScoreBoard
+        score={score}
+        currentTurn={game.currentTurn}
+        myColor={me.color}
+        activityLabel={game.status === 'playing' ? activityLabel : undefined}
+      />
       {/* 시각적으로 숨겨도 접근성 트리에는 남습니다. 상태가 바뀌면 문장 전체를 읽습니다. */}
       <div role="status" aria-atomic="true" className={styles.srOnly}>
-        {game.status === 'playing' && activityLabel ? activityLabel : announcement} 흑 {score.black}, 백 {score.white}.
+        {game.status === 'playing' && activityLabel ? activityLabel : announcement} 흑 {score.black}
+        , 백 {score.white}.
       </div>
       {passMessage && <p className={styles.notice}>{passMessage}</p>}
-      {game.status === 'finished' && <GameResult board={game.board} players={players} me={me} gameNumber={gameNumber} actions={finishedActions} />}
-      <Board board={game.board} legalMoves={legalMoves} lastMove={game.lastMove} showHints={showHints} onPlay={onPlay} />
+      {game.status === 'finished' && (
+        <GameResult
+          board={game.board}
+          players={players}
+          me={me}
+          gameNumber={gameNumber}
+          actions={finishedActions}
+        />
+      )}
+      <Board
+        board={game.board}
+        legalMoves={legalMoves}
+        lastMove={game.lastMove}
+        showHints={showHints}
+        onPlay={onPlay}
+      />
       {/* 종료 후의 로비/재대결 버튼은 결과 카드에 모아 중복된 퇴장 버튼을 만들지 않습니다. */}
-      {game.status === 'playing' && !roomClosed && <GameActions showHints={showHints} onToggleHints={() => setShowHints(value => !value)} onLeave={onLeave} leaving={leaving} />}
+      {game.status === 'playing' && !roomClosed && (
+        <GameActions
+          showHints={showHints}
+          onToggleHints={() => setShowHints(value => !value)}
+          onLeave={onLeave}
+          leaving={leaving}
+        />
+      )}
       <RulesHelp />
     </main>
   )

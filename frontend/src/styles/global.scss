@@ -1,13 +1,67 @@
 // 이 파일의 공통 스타일은 앱 전체에 적용합니다.
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-1Thin.ttf') format('truetype'); font-style: normal; font-weight: 100; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-2ExtraLight.ttf') format('truetype'); font-style: normal; font-weight: 200; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-3Light.ttf') format('truetype'); font-style: normal; font-weight: 300; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-4Regular.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-5Medium.ttf') format('truetype'); font-style: normal; font-weight: 500; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-6SemiBold.ttf') format('truetype'); font-style: normal; font-weight: 600; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-7Bold.ttf') format('truetype'); font-style: normal; font-weight: 700; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-8ExtraBold.ttf') format('truetype'); font-style: normal; font-weight: 800; font-display: swap; }
-@font-face { font-family: Paperlogy; src: url('/fonts/Paperlogy-9Black.ttf') format('truetype'); font-style: normal; font-weight: 900; font-display: swap; }
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-1Thin.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-2ExtraLight.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-3Light.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-4Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-5Medium.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-6SemiBold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-7Bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-8ExtraBold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: Paperlogy;
+  src: url('/fonts/Paperlogy-9Black.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
 // 색상 토큰은 여기서 한 번 정의하고 각 컴포넌트가 var(...)로 참조합니다. 색상표는 루트 color.md입니다.
 :root {
   --color-background: #f3f0ed;
@@ -45,17 +99,39 @@
 }
 
 // padding과 border를 선언한 너비에 포함하고 기본 여백/입력 글꼴을 맞추는 공통 초기화입니다.
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 280px; }
-button, input { font: inherit; }
-button { -webkit-tap-highlight-color: transparent; }
-button:enabled { cursor: pointer; }
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 280px;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+button:enabled {
+  cursor: pointer;
+}
 // 키보드로 이동할 때 포커스 위치를 분명히 표시합니다. outline은 요소 크기를 바꾸지 않습니다.
-button:focus-visible, input:focus-visible, summary:focus-visible {
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible {
   outline: 3px solid var(--color-primary-hover);
   outline-offset: 4px;
 }
-button:disabled { cursor: not-allowed; }
-h1, h2, p { margin: 0; }
+button:disabled {
+  cursor: not-allowed;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
 // svh는 모바일 브라우저 주소창이 보일 때의 작은 뷰포트 높이를 기준으로 합니다.
-#root { min-height: 100svh; }
+#root {
+  min-height: 100svh;
+}

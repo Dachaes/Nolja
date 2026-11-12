@@ -47,4 +47,8 @@ export interface RoomSession {
 }
 
 // 생성/입장 직후에만 방 상태와 본인의 참가 토큰을 한 번에 받습니다.
-export interface Admission { room: Room; playerId: string; token: string }
+export interface Admission {
+  room: Room
+  playerId: string
+  token: string
+}

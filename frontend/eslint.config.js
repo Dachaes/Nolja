@@ -23,4 +23,9 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    // 짧은 조건문도 블록을 표시해 다음 줄을 추가할 때 실행 범위를 오해하지 않게 합니다.
+    rules: { curly: ['error', 'all'] },
+  },
 ])

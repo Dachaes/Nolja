@@ -17,7 +17,9 @@ export function useRematch(code: string, session: RoomSession, gameNumber: numbe
       try {
         const room = await roomApi.state(code, session)
         receiveRoom(client, session, room)
-      } catch { /* 연결/방 종료 안내는 공통 연결 훅이 담당합니다. */ }
+      } catch {
+        /* 연결/방 종료 안내는 공통 연결 훅이 담당합니다. */
+      }
     },
     retry: false,
   })

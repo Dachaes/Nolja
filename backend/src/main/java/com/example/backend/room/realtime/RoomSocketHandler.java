@@ -1,34 +1,45 @@
 package com.example.backend.room.realtime;
 
+import com.example.backend.room.RoomException;
+import com.example.backend.room.RoomService;
+import com.example.backend.room.recovery.RecoveryPolicy;
+import jakarta.annotation.PreDestroy;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import jakarta.annotation.PreDestroy;
-import org.springframework.stereotype.Component;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tools.jackson.databind.json.JsonMapper;
-import com.example.backend.room.RoomException;
-import com.example.backend.room.RoomService;
-import com.example.backend.room.recovery.RecoveryPolicy;
 
-/** 연결/인증/수신을 담당합니다. 착수 규칙과 방별 전파는 RoomService와 RoomUpdates가 맡습니다. */
+/**
+ * WebSocket 연결, 참가자 인증, 메시지 수신을 담당합니다.
+ * TextWebSocketHandler를 상속해 연결됨·메시지 도착·연결 종료 시 호출되는 메서드를 구현합니다.
+ * 착수 규칙은 RoomService가, 같은 방 참가자에게 상태를 알리는 일은 RoomUpdates가 담당합니다.
+ */
 @Component
 public class RoomSocketHandler extends TextWebSocketHandler {
+
     private final RoomService rooms;
     private final JsonMapper json;
     private final RecoveryPolicy recovery;
-    private final ConcurrentHashMap<String, RoomSocketConnection> connections = new ConcurrentHashMap<>();
+    // 여러 기기의 요청이 동시에 와도 안전하게 조회/제거할 수 있는 연결 ID → 연결 객체 저장소입니다.
+    private final ConcurrentHashMap<String, RoomSocketConnection> connections =
+        new ConcurrentHashMap<>();
+    // 전송 작업마다 가벼운 가상 스레드를 사용해 느린 기기가 다른 기기의 전송을 막지 않게 합니다.
     private final ExecutorService writers = Executors.newVirtualThreadPerTaskExecutor();
+    // 인증 제한 시간은 별도 예약 작업으로 관리합니다.
     private final ScheduledExecutorService deadlines = Executors.newSingleThreadScheduledExecutor();
 
     public RoomSocketHandler(RoomService rooms, JsonMapper json, RecoveryPolicy recovery) {
-        this.rooms = rooms; this.json = json; this.recovery = recovery;
+        this.rooms = rooms;
+        this.json = json;
+        this.recovery = recovery;
     }
 
     @Override
@@ -39,20 +50,35 @@ public class RoomSocketHandler extends TextWebSocketHandler {
         RoomSocketConnection connection = new RoomSocketConnection(socket, json);
         connections.put(socket.getId(), connection);
         connection.start(writers);
-        deadlines.schedule(() -> {
-            // 시간 초과는 잘못된 토큰(401)과 다릅니다. 408로 보내 클라이언트가 참가 정보를 버리지 않고 재시도하게 합니다.
-            if (connection.token() == null) connection.fail("AUTH_TIMEOUT", "참가 인증 시간이 초과되었습니다. 다시 연결합니다.", 408);
-        }, 5, TimeUnit.SECONDS);
+        deadlines.schedule(
+            () -> {
+                // 시간 초과는 잘못된 토큰(401)과 다릅니다. 408로 보내 클라이언트가 참가 정보를 버리지 않고 재시도하게 합니다.
+                if (connection.token() == null) {
+                    connection.fail(
+                        "AUTH_TIMEOUT",
+                        "참가 인증 시간이 초과되었습니다. 다시 연결합니다.",
+                        408
+                    );
+                }
+            },
+            5,
+            TimeUnit.SECONDS
+        );
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession socket, TextMessage message) {
+        // 먼저 연결 객체를 찾고 URL 마지막 부분에서 방 코드를 읽습니다.
         RoomSocketConnection connection = connections.get(socket.getId());
-        if (connection == null) return;
+        if (connection == null) {
+            return;
+        }
         String[] path = socket.getUri().getPath().split("/");
         String code = path[path.length - 1];
         try {
-            if (path.length == 6 && "games".equals(path[2])) rooms.requireGameType(code, path[3]);
+            if (path.length == 6 && "games".equals(path[2])) {
+                rooms.requireGameType(code, path[3]);
+            }
             var body = json.readTree(message.getPayload());
             String type = body.path("type").asString("");
             if (connection.token() == null) {
@@ -61,6 +87,8 @@ public class RoomSocketHandler extends TextWebSocketHandler {
                     return;
                 }
                 String token = body.path("token").asString("");
+                // subscribe는 방이 바뀔 때 connection.state를 호출하도록 등록합니다.
+                // 반환된 Runnable은 나중에 run()을 호출하면 등록을 취소하는 정리 함수입니다.
                 Runnable unsubscribe = rooms.subscribe(code, token, connection::state);
                 connection.authenticated(token, unsubscribe);
             } else if ("ping".equals(type)) {
@@ -81,11 +109,14 @@ public class RoomSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession socket, CloseStatus status) {
         RoomSocketConnection connection = connections.remove(socket.getId());
-        if (connection != null) connection.dispose();
+        if (connection != null) {
+            connection.dispose();
+        }
     }
 
     @Override
-    public void handleTransportError(WebSocketSession socket, Throwable exception) throws Exception {
+    public void handleTransportError(WebSocketSession socket, Throwable exception)
+        throws Exception {
         afterConnectionClosed(socket, CloseStatus.SERVER_ERROR);
         socket.close(CloseStatus.SERVER_ERROR);
     }
@@ -95,7 +126,10 @@ public class RoomSocketHandler extends TextWebSocketHandler {
     public void expireSilentConnections() {
         long now = System.nanoTime();
         connections.forEach((id, connection) -> {
-            if (connection.heartbeatExpired(now, recovery.heartbeatTimeout().toNanos()) && connections.remove(id, connection)) {
+            if (
+                connection.heartbeatExpired(now, recovery.heartbeatTimeout().toNanos()) &&
+                connections.remove(id, connection)
+            ) {
                 connection.dispose();
                 // 느린 소켓의 close 전송이 다른 방의 기한 점검을 지연시키지 않게 별도 작업으로 닫습니다.
                 writers.execute(connection::closeSocket);
@@ -105,6 +139,7 @@ public class RoomSocketHandler extends TextWebSocketHandler {
 
     @PreDestroy
     public void shutdown() {
+        // 서버 종료 직전에 실행됩니다. 연결 구독과 백그라운드 작업을 함께 종료합니다.
         connections.values().forEach(RoomSocketConnection::dispose);
         connections.clear();
         writers.shutdownNow();

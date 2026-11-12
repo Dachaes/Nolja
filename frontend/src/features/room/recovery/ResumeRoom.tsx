@@ -10,19 +10,46 @@ export function ResumeRoom({ gameType }: { gameType: GameType }) {
   const [code, setCode] = useState(() => readActiveRoom(gameType))
   // 저장된 복귀 안내와 화면 상태를 함께 정리합니다.
   function dismiss() {
-    if (!code) return
+    if (!code) {
+      return
+    }
     dismissRoomRecovery(code, gameType)
     setCode(null)
   }
 
-  if (!code) return null
-  return <section className={styles.resume} aria-label="이전 방 복귀">
-    <button type="button" className={styles.close} aria-label="이전 방 복귀 안내 닫기" onClick={dismiss}>
-      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="m6 6 12 12M18 6 6 18" />
-      </svg>
-    </button>
-    <p>참가 중이던 {gameName(gameType)} 방이 있어요. <strong>{code}</strong></p>
-    <button type="button" className={styles.returnButton} onClick={() => navigate(roomPath(gameType, code))}>이전 방으로 돌아가기</button>
-  </section>
+  if (!code) {
+    return null
+  }
+  return (
+    <section className={styles.resume} aria-label="이전 방 복귀">
+      <button
+        type="button"
+        className={styles.close}
+        aria-label="이전 방 복귀 안내 닫기"
+        onClick={dismiss}
+      >
+        <svg
+          aria-hidden="true"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <path d="m6 6 12 12M18 6 6 18" />
+        </svg>
+      </button>
+      <p>
+        참가 중이던 {gameName(gameType)} 방이 있어요. <strong>{code}</strong>
+      </p>
+      <button
+        type="button"
+        className={styles.returnButton}
+        onClick={() => navigate(roomPath(gameType, code))}
+      >
+        이전 방으로 돌아가기
+      </button>
+    </section>
+  )
 }

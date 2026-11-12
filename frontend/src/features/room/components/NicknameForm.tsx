@@ -20,9 +20,14 @@ export function NicknameForm({ submitLabel, onSubmit }: NicknameFormProps) {
   // 기본 폼 제출(페이지 이동)을 막고, 검증 → API 요청 → 성공 이름 저장 순서로 처리합니다.
   async function submit(event: FormEvent) {
     event.preventDefault()
-    if (submitting.current) return
+    if (submitting.current) {
+      return
+    }
     const validation = nicknameError(nickname)
-    if (validation) { setError(validation); return }
+    if (validation) {
+      setError(validation)
+      return
+    }
     submitting.current = true
     setPending(true)
     setError(null)
@@ -45,13 +50,28 @@ export function NicknameForm({ submitLabel, onSubmit }: NicknameFormProps) {
       <label htmlFor="nickname">닉네임</label>
       {/* label과 안내 문구를 input에 연결해 스크린리더도 필드 의미와 오류를 알 수 있게 합니다. */}
       <input
-        id="nickname" name="nickname" autoComplete="nickname" autoFocus
-        value={nickname} disabled={pending} placeholder="어떤 이름으로 놀까요?"
-        aria-invalid={!!error} aria-describedby={error ? 'nickname-help nickname-error' : 'nickname-help'}
-        onChange={event => { setNickname(event.target.value); setError(null) }}
+        id="nickname"
+        name="nickname"
+        autoComplete="nickname"
+        autoFocus
+        value={nickname}
+        disabled={pending}
+        placeholder="어떤 이름으로 놀까요?"
+        aria-invalid={!!error}
+        aria-describedby={error ? 'nickname-help nickname-error' : 'nickname-help'}
+        onChange={event => {
+          setNickname(event.target.value)
+          setError(null)
+        }}
       />
-      <p id="nickname-help" className={styles.help}>문자·숫자·_·- 사용 가능 · 2~12자</p>
-      {error && <p id="nickname-error" className={styles.error} role="alert">{error}</p>}
+      <p id="nickname-help" className={styles.help}>
+        문자·숫자·_·- 사용 가능 · 2~12자
+      </p>
+      {error && (
+        <p id="nickname-error" className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
       <button className={styles.submit} type="submit" disabled={pending}>
         {pending ? '연결하는 중…' : submitLabel}
       </button>

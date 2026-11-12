@@ -10,9 +10,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class RecoveryConfig {
+
     @Bean
-    public RecoveryPolicy recoveryPolicy(@Value("${room.recovery.grace-period-ms:120000}") long graceMs,
-                                         @Value("${room.recovery.heartbeat-timeout-ms:45000}") long heartbeatMs) {
+    public RecoveryPolicy recoveryPolicy(
+        @Value("${room.recovery.grace-period-ms:120000}") long graceMs,
+        @Value("${room.recovery.heartbeat-timeout-ms:45000}") long heartbeatMs
+    ) {
+        // @Value는 설정 파일의 값을 읽고, 콜론 뒤 숫자는 값이 없을 때의 기본값입니다.
+        // 설정의 밀리초 숫자를 Duration(시간 길이)으로 바꿔 Spring이 공유할 정책 객체를 만듭니다.
         return new RecoveryPolicy(Duration.ofMillis(graceMs), Duration.ofMillis(heartbeatMs));
     }
 }

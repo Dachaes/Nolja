@@ -1,25 +1,75 @@
 // 브랜드를 왼쪽, 방 정보를 오른쪽에 배치하는 상단 바입니다.
 .header {
-  height: 72px; display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 0 40px; border-bottom: 1px solid var(--color-border);
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--color-border);
 }
 // 로고는 강조하고 보조 한글 이름은 작고 연한 색으로 표시합니다.
-.brand { font-size: 21px; font-weight: 750; letter-spacing: .3px; white-space: nowrap;
-  a { color: inherit; text-decoration: none; }
-  a:focus-visible { outline: 3px solid var(--color-primary-hover); outline-offset: 4px; border-radius: 2px; }
-  span { font-size: 13px; font-weight: 400; color: var(--color-muted); letter-spacing: 0; }
+.brand {
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  a:focus-visible {
+    outline: 3px solid var(--color-primary-hover);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+  span {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-muted);
+    letter-spacing: 0;
+  }
 }
 // 잠금 아이콘과 방 코드가 줄바꿈 없이 나란히 보이게 합니다.
-.room { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-muted); white-space: nowrap; }
+.room {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
 // 데스크톱에서 방 구분 문구와 코드 사이에 짧은 세로선을 둡니다.
-.divider { width: 1px; height: 13px; background: var(--color-border); margin: 0 7px; }
+.divider {
+  width: 1px;
+  height: 13px;
+  background: var(--color-border);
+  margin: 0 7px;
+}
 // 숫자가 포함된 방 코드에서도 숫자 폭을 일정하게 유지합니다.
-.roomCode { font-variant-numeric: tabular-nums; }
+.roomCode {
+  font-variant-numeric: tabular-nums;
+}
 // 모바일에서는 공간 확보를 위해 부가 문구/구분선은 숨기고 방 코드는 유지합니다.
 @media (max-width: 480px) {
-  .header { height: 68px; padding: 0 20px; }
-  .brand { font-size: 19px; span { font-size: 12px; } }
-  .room { font-size: 11px; gap: 5px; }
-  .divider { display: none; }
-  .room > span:first-of-type { display: none; }
+  .header {
+    height: 68px;
+    padding: 0 20px;
+  }
+  .brand {
+    font-size: 19px;
+    span {
+      font-size: 12px;
+    }
+  }
+  .room {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .divider {
+    display: none;
+  }
+  .room > span:first-of-type {
+    display: none;
+  }
 }

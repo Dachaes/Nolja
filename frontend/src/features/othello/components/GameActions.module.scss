@@ -44,5 +44,7 @@
 
 // 작은 화면에서는 안쪽 여백을 줄입니다.
 @media (max-width: 480px) {
-  .actions { padding: 0 6px; }
+  .actions {
+    padding: 0 6px;
+  }
 }

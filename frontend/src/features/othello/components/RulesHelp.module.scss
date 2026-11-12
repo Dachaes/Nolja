@@ -12,11 +12,20 @@
     width: fit-content;
     margin: 0 auto;
     cursor: pointer;
-    &:hover { color: var(--color-text); }
+    &:hover {
+      color: var(--color-text);
+    }
   }
 
   // 여러 규칙을 읽기 쉽도록 목록 들여쓰기와 항목 사이 간격을 맞춥니다.
-  ul { padding-left: 18px; margin: 16px 0 12px; }
-  li + li { margin-top: 7px; }
-  p { font-size: 11px; }
+  ul {
+    padding-left: 18px;
+    margin: 16px 0 12px;
+  }
+  li + li {
+    margin-top: 7px;
+  }
+  p {
+    font-size: 11px;
+  }
 }

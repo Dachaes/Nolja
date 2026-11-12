@@ -2,6 +2,10 @@
 
 Java 25 LTS, Spring Boot, Maven을 사용합니다. 데이터베이스 없이 방과 게임을 단일 서버 메모리에 저장합니다.
 
+## 코드 정렬
+
+Java는 공백 4칸으로 들여쓰며, UTF-8 인코딩을 사용합니다. 프런트엔드의 개발 의존성을 설치한 뒤 `frontend`에서 `npm run format`을 실행하면 백엔드 Java 소스와 테스트도 함께 정렬됩니다. 정렬 상태만 확인하려면 `npm run format:check`를 사용합니다.
+
 ## 실행
 
 Git Bash에서 프로젝트 루트 기준:

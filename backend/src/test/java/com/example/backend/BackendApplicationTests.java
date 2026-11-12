@@ -7,9 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class BackendApplicationTests {
 
-	@Test
-	// 본문이 비어 있어도 컨텍스트 생성 자체가 실패하면 이 테스트가 실패합니다.
-	void contextLoads() {
-	}
-
+    @Test
+    // 본문이 비어 있어도 컨텍스트 생성 자체가 실패하면 이 테스트가 실패합니다.
+    void contextLoads() {}
 }

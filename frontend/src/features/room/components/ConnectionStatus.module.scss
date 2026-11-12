@@ -7,8 +7,28 @@
   text-align: center;
   font-size: 12px;
 
-  p { display: inline-flex; align-items: center; gap: 7px; }
-  button { margin-left: 10px; padding: 7px; border: 0; border-radius: 5px; background: transparent; color: var(--color-primary-hover); font: inherit; text-decoration: underline; }
+  p {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  button {
+    margin-left: 10px;
+    padding: 7px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--color-primary-hover);
+    font: inherit;
+    text-decoration: underline;
+  }
 }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-muted); }
-.connected .dot { background: var(--color-hint); }
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-muted);
+}
+.connected .dot {
+  background: var(--color-hint);
+}

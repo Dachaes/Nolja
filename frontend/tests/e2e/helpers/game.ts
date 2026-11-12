@@ -31,7 +31,9 @@ export async function finishGame(host: Page, guest: Page, seed = 42): Promise<Ro
   const hostSession = await sessionOf(host, code)
   const guestSession = await sessionOf(guest, code)
   const sessions = [hostSession, guestSession]
-  const initial = await host.request.get(`${origin}/api/rooms/${code}/state`, { headers: { Authorization: `Bearer ${hostSession.token}` } })
+  const initial = await host.request.get(`${origin}/api/rooms/${code}/state`, {
+    headers: { Authorization: `Bearer ${hostSession.token}` },
+  })
   expect(initial.ok()).toBe(true)
   let room: Room = await initial.json()
   let steps = 0
@@ -45,7 +47,8 @@ export async function finishGame(host: Page, guest: Page, seed = 42): Promise<Ro
     const move = moves[seed % moves.length]
     const device = session.playerId === hostSession.playerId ? host : guest
     const response = await device.request.post(`${origin}/api/rooms/${code}/moves`, {
-      headers: { Authorization: `Bearer ${session.token}` }, data: { ...move, revision: room.revision },
+      headers: { Authorization: `Bearer ${session.token}` },
+      data: { ...move, revision: room.revision },
     })
     expect(response.ok()).toBe(true)
     room = await response.json()

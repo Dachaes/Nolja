@@ -1,30 +1,80 @@
 // 정사각형 보드를 8개의 같은 높이 행으로 나눕니다. 색상은 전역 토큰으로 관리합니다.
 .board {
-  width: 100%; aspect-ratio: 1; display: grid; grid-template-rows: repeat(8, 1fr);
-  overflow: hidden; border: 1.5px solid var(--color-grid); border-radius: 9px;
-  background: linear-gradient(135deg, var(--color-board-light), var(--color-board) 48%, var(--color-board-dark));
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  overflow: hidden;
+  border: 1.5px solid var(--color-grid);
+  border-radius: 9px;
+  background: linear-gradient(
+    135deg,
+    var(--color-board-light),
+    var(--color-board) 48%,
+    var(--color-board-dark)
+  );
   box-shadow: inset 0 0 20px rgb(from var(--color-grid) r g b / 7%);
 }
 // 각 행을 8열로 나눕니다. 마지막 행의 아래 선은 보드 외곽선과 겹치지 않게 생략합니다.
-.row { display: grid; grid-template-columns: repeat(8, 1fr); min-height: 0;
-  &:not(:last-child) { border-bottom: 1px solid var(--color-grid); }
+.row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  min-height: 0;
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--color-grid);
+  }
 }
 // 칸이 내용의 최소 크기 때문에 늘어나지 않게 합니다. 오른쪽 선도 마지막 칸에서는 생략합니다.
-.cell { min-width: 0; min-height: 0;
-  &:not(:last-child) { border-right: 1px solid var(--color-grid); }
+.cell {
+  min-width: 0;
+  min-height: 0;
+  &:not(:last-child) {
+    border-right: 1px solid var(--color-grid);
+  }
 }
 // 실제 클릭 버튼이 칸 전체를 덮습니다. 포커스 테두리는 안쪽으로 그려 보드에 잘리지 않게 합니다.
 .square {
-  width: 100%; height: 100%; border: 0; padding: 0; display: grid; place-items: center; background: transparent;
-  &[aria-disabled='true'] { cursor: default; }
-  &:focus-visible { position: relative; z-index: 1; outline: 3px solid var(--color-primary-hover); outline-offset: -4px; }
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  &[aria-disabled='true'] {
+    cursor: default;
+  }
+  &:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 3px solid var(--color-primary-hover);
+    outline-offset: -4px;
+  }
 }
 // 놓을 수 있는 칸만 상호작용 배경을 표시합니다. hover 지원 기기에서만 마우스 효과를 켭니다.
-.legal { transition: background 120ms ease;
-  @media (hover: hover) { &:hover { background: rgb(from var(--color-white) r g b / 24%); } }
-  &:active { background: rgb(from var(--color-white) r g b / 35%); }
+.legal {
+  transition: background 120ms ease;
+  @media (hover: hover) {
+    &:hover {
+      background: rgb(from var(--color-white) r g b / 24%);
+    }
+  }
+  &:active {
+    background: rgb(from var(--color-white) r g b / 35%);
+  }
 }
 // 작은 점은 착수 가능 위치입니다. 클릭은 점이 아닌 바깥 버튼이 받습니다.
-.hint { width: 16%; aspect-ratio: 1; border-radius: 50%; background: var(--color-hint); opacity: .45; pointer-events: none; }
+.hint {
+  width: 16%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-hint);
+  opacity: 0.45;
+  pointer-events: none;
+}
 // 운영체제의 동작 줄이기 설정을 존중해 배경 전환 효과를 끕니다.
-@media (prefers-reduced-motion: reduce) { .legal { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .legal {
+    transition: none;
+  }
+}

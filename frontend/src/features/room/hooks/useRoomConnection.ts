@@ -29,11 +29,16 @@ export function useRoomConnection(code: string, session: RoomSession) {
       onStatus: setStatus,
       onError: error => {
         setError(error)
-        if (isTerminalError(error)) clearSession(code, gameType)
+        if (isTerminalError(error)) {
+          clearSession(code, gameType)
+        }
       },
     })
     connection.current = subscription
-    return () => { subscription.dispose(); connection.current = null }
+    return () => {
+      subscription.dispose()
+      connection.current = null
+    }
   }, [client, code, playerId, token, gameType])
 
   return { status, error, serverOffset, retry: () => connection.current?.retry() }

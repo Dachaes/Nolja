@@ -11,7 +11,22 @@
   font-size: 13px;
   line-height: 1.7;
   overflow-wrap: anywhere;
-  button { margin-top: 12px; padding: 10px 16px; border: 0; border-radius: 8px; background: var(--color-primary); color: var(--color-on-primary); }
+  button {
+    margin-top: 12px;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
 }
-.help { margin-top: 6px; color: var(--color-muted); font-size: 12px; }
-.countdown { margin-top: 8px; color: var(--color-primary-hover); font-variant-numeric: tabular-nums; }
+.help {
+  margin-top: 6px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+.countdown {
+  margin-top: 8px;
+  color: var(--color-primary-hover);
+  font-variant-numeric: tabular-nums;
+}

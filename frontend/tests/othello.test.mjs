@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
-  createInitialGame, getFlips, getLegalMoves, getScore, getWinner, playMove,
+  createInitialGame,
+  getFlips,
+  getLegalMoves,
+  getScore,
+  getWinner,
+  playMove,
 } from '../src/features/othello/rules.ts'
 
 // 이 테스트는 UI/서버 없이 규칙 함수만 실행합니다. 각 테스트는 준비 → 실행 → 결과 확인 순서입니다.
@@ -19,7 +24,10 @@ test('initial board has the official four discs, black starts, and four legal mo
   assert.equal(game.board[4][3], 'black')
   assert.equal(game.board[4][4], 'white')
   assert.deepEqual(getLegalMoves(game.board, 'black'), [
-    { row: 2, col: 3 }, { row: 3, col: 2 }, { row: 4, col: 5 }, { row: 5, col: 4 },
+    { row: 2, col: 3 },
+    { row: 3, col: 2 },
+    { row: 4, col: 5 },
+    { row: 5, col: 4 },
   ])
 })
 
@@ -41,20 +49,37 @@ test('D3 flips D4, updates score, switches turn, and preserves the input board',
 test('occupied, non-capturing, out-of-bounds, and fractional moves are rejected', () => {
   const game = createInitialGame()
   for (const position of [
-    { row: 3, col: 3 }, { row: 0, col: 0 }, { row: -1, col: 3 },
-    { row: 8, col: 2 }, { row: 2, col: 8 }, { row: 2.5, col: 3 },
-  ]) assert.equal(playMove(game, position), game)
+    { row: 3, col: 3 },
+    { row: 0, col: 0 },
+    { row: -1, col: 3 },
+    { row: 8, col: 2 },
+    { row: 2, col: 8 },
+    { row: 2.5, col: 3 },
+  ])
+    assert.equal(playMove(game, position), game)
 })
 
 // 중심 주변에 상대 돌, 그 바깥에 내 돌을 배치해 8방향을 한 번에 뒤집는 상황을 만듭니다.
 test('a single move captures all eight directions', () => {
   const board = emptyBoard()
-  for (const [dr, dc] of [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]) {
+  for (const [dr, dc] of [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ]) {
     board[3 + dr][3 + dc] = 'white'
     board[3 + 2 * dr][3 + 2 * dc] = 'black'
   }
   assert.equal(getFlips(board, 'black', { row: 3, col: 3 }).length, 8)
-  assert.deepEqual(getScore(playMove(gameWith(board), { row: 3, col: 3 }).board), { black: 17, white: 0 })
+  assert.deepEqual(getScore(playMove(gameWith(board), { row: 3, col: 3 }).board), {
+    black: 17,
+    white: 0,
+  })
 })
 
 // 모서리에서 긴 줄을 끝까지 뒤집을 때 경계 처리가 올바른지 확인합니다.

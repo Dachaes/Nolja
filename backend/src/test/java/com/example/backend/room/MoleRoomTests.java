@@ -1,6 +1,7 @@
 package com.example.backend.room;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import com.example.backend.mole.MoleMatch;
 import com.example.backend.room.RoomDtos.*;
 import java.time.Clock;
@@ -13,6 +14,7 @@ import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Test;
 
 class MoleRoomTests {
+
     private final MutableClock clock = new MutableClock();
     private final RoomService rooms = new RoomService(clock);
     private final Admission host = rooms.create("host", "whack-a-mole");
@@ -28,7 +30,12 @@ class MoleRoomTests {
     }
 
     private List<MoleMatch.Target> active(RoomView room) {
-        return room.mole().holes().stream().filter(target -> target != null && target.claimedBy() == null).toList();
+        return room
+            .mole()
+            .holes()
+            .stream()
+            .filter(target -> target != null && target.claimedBy() == null)
+            .toList();
     }
 
     @Test
@@ -41,9 +48,17 @@ class MoleRoomTests {
         var request = new HitRequest(target.hole(), target.id(), 1);
         var go = new CountDownLatch(1);
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            var one = executor.submit(() -> { go.await(); return rooms.hit(code, host.token(), request); });
-            var two = executor.submit(() -> { go.await(); return rooms.hit(code, guest.token(), request); });
-            go.countDown(); one.get(); two.get();
+            var one = executor.submit(() -> {
+                go.await();
+                return rooms.hit(code, host.token(), request);
+            });
+            var two = executor.submit(() -> {
+                go.await();
+                return rooms.hit(code, guest.token(), request);
+            });
+            go.countDown();
+            one.get();
+            two.get();
         }
         var result = rooms.state(code, host.token());
         assertEquals(100, result.mole().scores().stream().mapToInt(MoleMatch.Score::score).sum());
@@ -94,12 +109,27 @@ class MoleRoomTests {
     @Test
     void differentTargetsDoNotConflictOnRoomRevisionAndExpiredTargetsAreHarmless() {
         var targets = active(start());
-        rooms.hit(code, host.token(), new HitRequest(targets.get(0).hole(), targets.get(0).id(), 1));
-        rooms.hit(code, guest.token(), new HitRequest(targets.get(1).hole(), targets.get(1).id(), 1));
+        rooms.hit(
+            code,
+            host.token(),
+            new HitRequest(targets.get(0).hole(), targets.get(0).id(), 1)
+        );
+        rooms.hit(
+            code,
+            guest.token(),
+            new HitRequest(targets.get(1).hole(), targets.get(1).id(), 1)
+        );
         clock.advance(2000);
-        rooms.hit(code, host.token(), new HitRequest(targets.get(2).hole(), targets.get(2).id(), 1));
+        rooms.hit(
+            code,
+            host.token(),
+            new HitRequest(targets.get(2).hole(), targets.get(2).id(), 1)
+        );
         var result = rooms.state(code, host.token());
-        assertEquals(List.of(100, 100), result.mole().scores().stream().map(MoleMatch.Score::score).toList());
+        assertEquals(
+            List.of(100, 100),
+            result.mole().scores().stream().map(MoleMatch.Score::score).toList()
+        );
         assertEquals(1, result.mole().scores().getFirst().combo());
     }
 
@@ -116,8 +146,12 @@ class MoleRoomTests {
         guestConnection.run();
         var paused = rooms.state(code, host.token());
         assertNotNull(paused.mole().pausedAt());
-        assertEquals("PLAYER_DISCONNECTED", assertThrows(RoomException.class,
-                () -> rooms.hit(code, host.token(), new HitRequest(0, null, 1))).code());
+        assertEquals(
+            "PLAYER_DISCONNECTED",
+            assertThrows(RoomException.class, () ->
+                rooms.hit(code, host.token(), new HitRequest(0, null, 1))
+            ).code()
+        );
         clock.advance(40000);
         rooms.tickMoleRooms();
         assertEquals("playing", rooms.state(code, host.token()).status());
@@ -146,34 +180,71 @@ class MoleRoomTests {
         assertEquals("playing", next.status());
         assertEquals(clock.instant().plusSeconds(3), next.mole().startsAt());
         assertEquals(0, next.mole().scores().getFirst().bestCombo());
-        assertEquals("STALE_GAME", assertThrows(RoomException.class,
-                () -> rooms.hit(code, host.token(), new HitRequest(target.hole(), target.id(), 1))).code());
+        assertEquals(
+            "STALE_GAME",
+            assertThrows(RoomException.class, () ->
+                rooms.hit(code, host.token(), new HitRequest(target.hole(), target.id(), 1))
+            ).code()
+        );
     }
 
     @Test
     void authenticationBoundsGameIsolationAndExplicitLeaveAreEnforced() {
         var state = start();
-        assertEquals("INVALID_SESSION", assertThrows(RoomException.class,
-                () -> rooms.hit(code, "wrong", new HitRequest(0, null, 1))).code());
-        assertEquals("INVALID_HIT", assertThrows(RoomException.class,
-                () -> rooms.hit(code, host.token(), new HitRequest(16, null, 1))).code());
-        assertEquals("WRONG_GAME", assertThrows(RoomException.class,
-                () -> rooms.move(code, host.token(), new MoveRequest(2, 3, state.revision()))).code());
+        assertEquals(
+            "INVALID_SESSION",
+            assertThrows(RoomException.class, () ->
+                rooms.hit(code, "wrong", new HitRequest(0, null, 1))
+            ).code()
+        );
+        assertEquals(
+            "INVALID_HIT",
+            assertThrows(RoomException.class, () ->
+                rooms.hit(code, host.token(), new HitRequest(16, null, 1))
+            ).code()
+        );
+        assertEquals(
+            "WRONG_GAME",
+            assertThrows(RoomException.class, () ->
+                rooms.move(code, host.token(), new MoveRequest(2, 3, state.revision()))
+            ).code()
+        );
         var othello = rooms.create("other");
-        assertEquals("WRONG_GAME", assertThrows(RoomException.class,
-                () -> rooms.hit(othello.room().code(), othello.token(), new HitRequest(0, null, 1))).code());
-        assertEquals("INVALID_GAME", assertThrows(RoomException.class, () -> rooms.create("name", "unknown")).code());
+        assertEquals(
+            "WRONG_GAME",
+            assertThrows(RoomException.class, () ->
+                rooms.hit(othello.room().code(), othello.token(), new HitRequest(0, null, 1))
+            ).code()
+        );
+        assertEquals(
+            "INVALID_GAME",
+            assertThrows(RoomException.class, () -> rooms.create("name", "unknown")).code()
+        );
         rooms.leave(code, guest.token());
-        clock.advance(60000); rooms.tickMoleRooms();
+        clock.advance(60000);
+        rooms.tickMoleRooms();
         assertEquals("closed", rooms.state(code, host.token()).status());
         assertFalse(rooms.state(code, host.token()).mole().finished());
     }
 
     private static class MutableClock extends Clock {
+
         Instant now = Instant.parse("2026-11-11T00:00:00Z");
-        void advance(long millis) { now = now.plusMillis(millis); }
-        public ZoneId getZone() { return ZoneOffset.UTC; }
-        public Clock withZone(ZoneId zone) { return this; }
-        public Instant instant() { return now; }
+
+        void advance(long millis) {
+            now = now.plusMillis(millis);
+        }
+
+        public ZoneId getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        public Clock withZone(ZoneId zone) {
+            return this;
+        }
+
+        public Instant instant() {
+            return now;
+        }
     }
 }

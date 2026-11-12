@@ -1,5 +1,7 @@
 // 초대 버튼, 복사 결과, 수동 복사 입력란을 묶는 영역입니다.
-.invite { text-align: center; }
+.invite {
+  text-align: center;
+}
 // 아이콘과 글자를 가운데 정렬하고 터치하기 충분한 높이를 확보합니다.
 .copy {
   width: 100%;
@@ -15,10 +17,17 @@
   font-size: 14px;
   font-weight: 600;
 
-  &:hover { background: var(--color-primary-hover); }
+  &:hover {
+    background: var(--color-primary-hover);
+  }
 }
 // 복사 성공 또는 수동 복사 안내가 표시되는 보조 문구입니다.
-.feedback { margin-top: 12px; color: var(--color-muted); font-size: 12px; line-height: 1.7; }
+.feedback {
+  margin-top: 12px;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
 // 클립보드 사용이 실패한 경우 표시하는 읽기 전용 링크 입력란입니다.
 .link {
   width: 100%;
@@ -31,4 +40,9 @@
   font-size: 12px;
 }
 // localhost 주소를 다른 기기로 공유할 때 필요한 개발 환경 안내입니다.
-.localHelp { margin-top: 10px; font-size: 11px; color: var(--color-muted); line-height: 1.6; }
+.localHelp {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--color-muted);
+  line-height: 1.6;
+}

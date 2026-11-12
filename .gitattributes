@@ -1,0 +1,5 @@
+# 코드와 문서는 LF로 저장하고, 바이너리 파일은 자동으로 구분합니다.
+* text=auto eol=lf
+
+# Windows 실행 스크립트는 CRLF를 사용합니다.
+*.cmd text eol=crlf

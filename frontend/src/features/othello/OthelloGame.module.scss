@@ -32,5 +32,9 @@
 
 // 휴대폰에서는 바깥 여백을 줄여 보드에 더 많은 가로 공간을 제공합니다.
 @media (max-width: 480px) {
-  .game { width: calc(100% - 32px); max-width: 400px; margin-top: 20px; }
+  .game {
+    width: calc(100% - 32px);
+    max-width: 400px;
+    margin-top: 20px;
+  }
 }

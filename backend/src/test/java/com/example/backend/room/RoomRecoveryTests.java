@@ -1,6 +1,8 @@
 package com.example.backend.room;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.example.backend.room.RoomDtos.*;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -8,10 +10,10 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import com.example.backend.room.RoomDtos.*;
 
 // 가짜 시계로 2분을 즉시 이동시켜 복귀 기한의 직전/경계와 오래된 연결 종료를 검증합니다.
 class RoomRecoveryTests {
+
     private final MutableClock clock = new MutableClock();
     private final RoomService rooms = new RoomService(clock);
     private final Admission host = rooms.create("host");
@@ -26,10 +28,17 @@ class RoomRecoveryTests {
         RoomView moved = rooms.move(code, host.token(), new MoveRequest(2, 3, started.revision()));
         guestSocket.run();
         RoomView paused = rooms.state(code, host.token());
-        assertEquals(clock.instant().plusSeconds(120), paused.presence().get(1).reconnectDeadline());
+        assertEquals(
+            clock.instant().plusSeconds(120),
+            paused.presence().get(1).reconnectDeadline()
+        );
         assertFalse(paused.presence().get(1).connected());
-        assertEquals("PLAYER_DISCONNECTED", assertThrows(RoomException.class,
-                () -> rooms.move(code, guest.token(), new MoveRequest(2, 2, paused.revision()))).code());
+        assertEquals(
+            "PLAYER_DISCONNECTED",
+            assertThrows(RoomException.class, () ->
+                rooms.move(code, guest.token(), new MoveRequest(2, 2, paused.revision()))
+            ).code()
+        );
         clock.now = clock.now.plusSeconds(119);
         List<RoomView> restored = new ArrayList<>();
         rooms.subscribe(code, guest.token(), restored::add);
@@ -39,9 +48,16 @@ class RoomRecoveryTests {
         assertEquals("white", latest.game().currentTurn());
         assertEquals(moved.game().lastMove(), latest.game().lastMove());
         assertEquals(moved.gameNumber(), latest.gameNumber());
-        assertTrue(latest.presence().stream().allMatch(player -> player.connected()));
+        assertTrue(
+            latest
+                .presence()
+                .stream()
+                .allMatch(player -> player.connected())
+        );
         assertNull(latest.presence().get(1).reconnectDeadline());
-        assertDoesNotThrow(() -> rooms.move(code, guest.token(), new MoveRequest(2, 2, latest.revision())));
+        assertDoesNotThrow(() ->
+            rooms.move(code, guest.token(), new MoveRequest(2, 2, latest.revision()))
+        );
     }
 
     @Test
@@ -75,8 +91,16 @@ class RoomRecoveryTests {
         rooms.subscribe(code, guest.token(), restored::add);
         assertEquals("closed", restored.getLast().status());
         assertEquals(closed.revision(), restored.getLast().revision());
-        assertEquals("ROOM_CLOSED", assertThrows(RoomException.class, () -> rooms.rematch(code, guest.token(), new RematchRequest(1, true))).code());
-        assertEquals("INVALID_SESSION", assertThrows(RoomException.class, () -> rooms.state(code, "wrong")).code());
+        assertEquals(
+            "ROOM_CLOSED",
+            assertThrows(RoomException.class, () ->
+                rooms.rematch(code, guest.token(), new RematchRequest(1, true))
+            ).code()
+        );
+        assertEquals(
+            "INVALID_SESSION",
+            assertThrows(RoomException.class, () -> rooms.state(code, "wrong")).code()
+        );
     }
 
     @Test
@@ -93,18 +117,40 @@ class RoomRecoveryTests {
     void simultaneousAbsenceAlsoExpiresAndClosedSnapshotsRemainReadOnly() {
         Runnable black = rooms.subscribe(code, host.token(), ignored -> {});
         Runnable white = rooms.subscribe(code, guest.token(), ignored -> {});
-        black.run(); white.run();
+        black.run();
+        white.run();
         clock.now = clock.now.plusSeconds(120);
         rooms.expireDisconnectedRooms();
         assertEquals("reconnect_timeout", rooms.state(code, host.token()).closeReason());
-        assertEquals("ROOM_CLOSED", assertThrows(RoomException.class, () -> rooms.move(code, host.token(), new MoveRequest(2, 3, 0))).code());
-        assertEquals("ROOM_CLOSED", assertThrows(RoomException.class, () -> rooms.join(code, "third")).code());
+        assertEquals(
+            "ROOM_CLOSED",
+            assertThrows(RoomException.class, () ->
+                rooms.move(code, host.token(), new MoveRequest(2, 3, 0))
+            ).code()
+        );
+        assertEquals(
+            "ROOM_CLOSED",
+            assertThrows(RoomException.class, () -> rooms.join(code, "third")).code()
+        );
     }
 
     private static final class MutableClock extends Clock {
+
         Instant now = Instant.parse("2026-11-10T00:00:00Z");
-        @Override public ZoneId getZone() { return ZoneOffset.UTC; }
-        @Override public Clock withZone(ZoneId zone) { return this; }
-        @Override public Instant instant() { return now; }
+
+        @Override
+        public ZoneId getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        @Override
+        public Clock withZone(ZoneId zone) {
+            return this;
+        }
+
+        @Override
+        public Instant instant() {
+            return now;
+        }
     }
 }

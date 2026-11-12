@@ -10,7 +10,7 @@ import { HomePage } from '../home/HomePage'
 import { roomApi } from './api/roomApi'
 import { admissionSession, roomPath } from './model/gameType'
 
-// 별도 라우팅 라이브러리 없이 홈(/)과 초대 주소(/room/:code)를 구분합니다.
+// 별도 라우팅 라이브러리 없이 홈, 게임별 로비, 초대받은 방의 URL을 구분합니다.
 export function RoomRouter() {
   const pathname = usePathname()
   // 브라우저가 sessionStorage를 차단해도 현재 화면에서는 입장을 이어가도록 메모리에도 보관합니다.
@@ -33,31 +33,71 @@ export function RoomRouter() {
   }
 
   // RoomPage의 key가 달라지면 이전 방의 React 상태를 버리고 새 방 상태로 시작합니다.
-  if (pathname === '/') return <HomePage />
-  if (pathname === '/games/othello') return <RoomEntry key="othello" gameType="othello" onAdmitted={admitted} />
-  if (pathname === '/games/whack-a-mole') return <RoomEntry key="whack-a-mole" gameType="whack-a-mole" onAdmitted={admitted} />
+  if (pathname === '/') {
+    return <HomePage />
+  }
+  if (pathname === '/games/othello') {
+    return <RoomEntry key="othello" gameType="othello" onAdmitted={admitted} />
+  }
+  if (pathname === '/games/whack-a-mole') {
+    return <RoomEntry key="whack-a-mole" gameType="whack-a-mole" onAdmitted={admitted} />
+  }
   if (match) {
     const gameType = match[1].toLowerCase() as 'othello' | 'whack-a-mole'
     const code = match[2].toUpperCase()
-    return <RoomPage key={`${gameType}:${code}`} code={code} gameType={gameType}
-      initialSession={created?.room.code === code && created.room.gameType === gameType ? admissionSession(created) : undefined} onHome={home} />
+    return (
+      <RoomPage
+        key={`${gameType}:${code}`}
+        code={code}
+        gameType={gameType}
+        initialSession={
+          created?.room.code === code && created.room.gameType === gameType
+            ? admissionSession(created)
+            : undefined
+        }
+        onHome={home}
+      />
+    )
   }
-  if (legacy) return <LegacyRoom code={legacy[1].toUpperCase()} onHome={home} />
-  return <main className={styles.state}>
-    <h2>올바른 초대 링크가 아니에요</h2>
-    <p>친구에게 링크를 다시 받거나 새 방을 만들어 주세요.</p>
-    <button type="button" onClick={home}>새 방 만들기</button>
-  </main>
+  if (legacy) {
+    return <LegacyRoom code={legacy[1].toUpperCase()} onHome={home} />
+  }
+  return (
+    <main className={styles.state}>
+      <h2>올바른 초대 링크가 아니에요</h2>
+      <p>친구에게 링크를 다시 받거나 새 방을 만들어 주세요.</p>
+      <button type="button" onClick={home}>
+        새 방 만들기
+      </button>
+    </main>
+  )
 }
 
 // 과거 초대 링크는 서버가 확인한 게임 종류의 주소로만 연결합니다.
 function LegacyRoom({ code, onHome }: { code: string; onHome: () => void }) {
-  const preview = useQuery({ queryKey: ['legacy-room-preview', code], queryFn: ({ signal }) => roomApi.legacyPreview(code, signal), retry: false })
+  const preview = useQuery({
+    queryKey: ['legacy-room-preview', code],
+    queryFn: ({ signal }) => roomApi.legacyPreview(code, signal),
+    retry: false,
+  })
   useEffect(() => {
-    if (preview.data) navigate(roomPath(preview.data.gameType, code), true)
+    if (preview.data) {
+      navigate(roomPath(preview.data.gameType, code), true)
+    }
   }, [preview.data, code])
-  return <main className={styles.state}>
-    {preview.error ? <><h2>방을 확인할 수 없어요</h2><p role="alert">{preview.error.message}</p><button type="button" onClick={onHome}>로비로 돌아가기</button></>
-      : <p role="status">초대받은 게임을 확인하는 중…</p>}
-  </main>
+  return (
+    <main className={styles.state}>
+      {preview.error ? (
+        <>
+          <h2>방을 확인할 수 없어요</h2>
+          <p role="alert">{preview.error.message}</p>
+          <button type="button" onClick={onHome}>
+            로비로 돌아가기
+          </button>
+        </>
+      ) : (
+        <p role="status">초대받은 게임을 확인하는 중…</p>
+      )}
+    </main>
+  )
 }

@@ -1,12 +1,14 @@
 package com.example.backend.othello;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Arrays;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 // Spring 서버 없이 순수 규칙 엔진만 검사합니다. 각 상황은 최소한의 보드를 직접 만들어 재현합니다.
 class OthelloRulesTests {
+
     @Test
     // 중심의 8방향을 모두 뒤집으면서도 입력 보드는 수정하지 않는지 확인합니다.
     void allEightDirectionsFlipWithoutMutatingOriginal() {
@@ -36,7 +38,11 @@ class OthelloRulesTests {
         assertEquals("black", next.currentTurn());
         assertEquals("finished", OthelloRules.play(next, 7, 7).status());
         board[7][6] = "black";
-        var early = OthelloRules.play(new GameState(board, "black", "playing", null, null, 0), 0, 2);
+        var early = OthelloRules.play(
+            new GameState(board, "black", "playing", null, null, 0),
+            0,
+            2
+        );
         assertEquals("finished", early.status());
         assertNull(early.board()[7][7]);
         assertThrows(IllegalArgumentException.class, () -> OthelloRules.play(early, 7, 7));
@@ -52,13 +58,21 @@ class OthelloRulesTests {
                 assertTrue(game.moveCount() < 60);
                 var moves = new java.util.ArrayList<GameState.Position>();
                 for (int row = 0; row < 8; row++) for (int col = 0; col < 8; col++) {
-                    if (!OthelloRules.flips(game.board(), game.currentTurn(), row, col).isEmpty()) moves.add(new GameState.Position(row, col));
+                    if (
+                        !OthelloRules.flips(game.board(), game.currentTurn(), row, col).isEmpty()
+                    ) moves.add(new GameState.Position(row, col));
                 }
                 assertFalse(moves.isEmpty());
                 var move = moves.get(random.nextInt(moves.size()));
                 game = OthelloRules.play(game, move.row(), move.col());
                 // 한 번 둘 때 전체 돌은 정확히 하나 증가합니다. 뒤집기는 색상만 바꾸므로 개수를 늘리지 않습니다.
-                assertEquals(game.moveCount() + 4, Arrays.stream(game.board()).flatMap(Arrays::stream).filter(cell -> cell != null).count());
+                assertEquals(
+                    game.moveCount() + 4,
+                    Arrays.stream(game.board())
+                        .flatMap(Arrays::stream)
+                        .filter(cell -> cell != null)
+                        .count()
+                );
             }
             assertNull(game.currentTurn());
             assertFalse(OthelloRules.canPlay(game.board(), "black"));

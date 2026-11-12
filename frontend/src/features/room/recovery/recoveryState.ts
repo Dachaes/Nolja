@@ -5,8 +5,12 @@ import type { CloseReason } from './types.ts'
 export const allPlayersConnected = (room: Room) => room.presence.every(player => player.connected)
 
 export function closedRoomMessage(reason: CloseReason | null) {
-  if (reason === 'reconnect_timeout') return '재접속 대기 시간이 지나 종료된 방입니다.'
-  if (reason === 'expired') return '방의 유효 시간이 지났습니다. 새 방을 만들어 주세요.'
+  if (reason === 'reconnect_timeout') {
+    return '재접속 대기 시간이 지나 종료된 방입니다.'
+  }
+  if (reason === 'expired') {
+    return '방의 유효 시간이 지났습니다. 새 방을 만들어 주세요.'
+  }
   return '참가자가 나가서 종료된 방입니다.'
 }
 

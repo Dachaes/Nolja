@@ -8,17 +8,41 @@
   background: var(--color-surface);
   font-size: 13px;
   line-height: 1.6;
-  strong { display: block; margin-top: 4px; letter-spacing: 1px; }
-  p { padding-inline: 20px; }
+  strong {
+    display: block;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+  p {
+    padding-inline: 20px;
+  }
 }
 
-.returnButton { margin-top: 12px; padding: 10px 16px; border: 0; border-radius: 8px; background: var(--color-primary); color: var(--color-on-primary); }
+.returnButton {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
 
 // 닫기는 카드 오른쪽 위에 배치하고 터치하기 충분한 영역을 확보합니다.
 .close {
-  position: absolute; top: 4px; right: 4px;
-  display: grid; place-items: center; width: 36px; height: 36px;
-  padding: 0; border: 0; border-radius: 8px;
-  background: transparent; color: var(--color-muted);
-  &:hover { background: var(--color-background); color: var(--color-text); }
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted);
+  &:hover {
+    background: var(--color-background);
+    color: var(--color-text);
+  }
 }

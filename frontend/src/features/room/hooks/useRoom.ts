@@ -23,16 +23,20 @@ export function useRoom(code: string, session: RoomSession) {
     // 연결 직후 최신 보드도 WebSocket으로 받습니다. 타이머/포커스 변경에 따른 상태 조회는 하지 않습니다.
     enabled: false,
     retry: false,
-    structuralSharing: (previous: unknown, incoming: unknown) => keepNewestRoom(previous as Room | undefined, incoming as Room),
+    structuralSharing: (previous: unknown, incoming: unknown) =>
+      keepNewestRoom(previous as Room | undefined, incoming as Room),
   })
 
   const move = useMutation({
-    mutationFn: ({ position, revision }: { position: Position; revision: number }) => roomApi.move(code, session, position, revision),
+    mutationFn: ({ position, revision }: { position: Position; revision: number }) =>
+      roomApi.move(code, session, position, revision),
     onSuccess: room => {
       receiveRoom(client, session, room)
     },
     // 응답 유실/오래된 버전 같은 실패 때만 일회성 재조회합니다. 정상 게임에서는 폴링하지 않습니다.
-    onError: () => { void query.refetch() },
+    onError: () => {
+      void query.refetch()
+    },
     retry: false,
   })
 

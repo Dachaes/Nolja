@@ -4,7 +4,10 @@ export type DiscColor = 'black' | 'white'
 export type Cell = DiscColor | null
 // 읽기 전용 타입으로 기존 보드에 직접 쓰는 실수를 줄입니다. 실제 수정은 복사본에 합니다.
 export type Board = ReadonlyArray<ReadonlyArray<Cell>>
-export interface Position { row: number; col: number }
+export interface Position {
+  row: number
+  col: number
+}
 
 // 참가자 식별자와 표시 이름을 분리합니다. 닉네임은 인증에 사용하지 않습니다.
 export interface Player {
